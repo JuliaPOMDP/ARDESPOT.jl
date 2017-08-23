@@ -1,10 +1,15 @@
 function build_despot(p::DESPOTPlanner, b_0)
-    D = DESPOT(b_0)
+    D = DESPOT(p, b_0)
     b = 1
+    trial = 1
     start = CPUtime_us()
-    while D.mus[b]-D.ls[b] > p.sol.epsilon_0 && CPUTime_us()-start < p.sol.T_max*1000
-        b = explore(D, b, p)
+
+    while D.mu[1]-D.l[1] > p.sol.epsilon_0 &&
+          CPUtime_us()-start < p.sol.T_max*1e6 &&
+          trial <= p.sol.max_trials
+        b = explore!(D, 1, p)
         backup!(D, b, p)
+        trial += 1
     end
 
     return D
@@ -15,7 +20,7 @@ function explore!(D::DESPOT, b::Int, p::DESPOTPlanner)
         if isempty(D.children[b]) # a leaf
             expand!(D, b, p)
         end
-        b = next_best(D, b)
+        b = next_best(D, b, p)
     end
     if D.Delta[b] > p.sol.D
         make_default!(D, b)
@@ -34,18 +39,19 @@ function prune!(D::DESPOT, b::Int, p::DESPOTPlanner)
         else
             break
         end
+        b = D.parent_b[b]
     end
     return blocked
 end
 
 function find_blocker(D::DESPOT, b::Int, p::DESPOTPlanner)
     len = 1
-    bp = D.parent[b] # Note: unlike the normal use of bp, here bp is a parent following equation (12)
+    bp = D.parent_b[b] # Note: unlike the normal use of bp, here bp is a parent following equation (12)
     while bp != 1
         if D.mu[bp] - D.l_0[bp] <= p.sol.lambda * len
             return bp
         else
-            bp = D.parent[bp]
+            bp = D.parent_b[bp]
         end
     end
     return 0 # no blocker
@@ -60,13 +66,37 @@ end
 function backup!(D::DESPOT, b::Int, p::DESPOTPlanner)
     # Note: maybe this could be sped up by just calculating the change in the one mu and l corresponding to bp, rather than summing up over all bp
     while b != 1 
-        ba = D.parent_ba[b]
-        b = D.parent[b]
+        ba = D.parent[b]
+        b = D.parent_b[b]
 
-        D.ba_mu[ba] = ba_rho[ba] + sum(D.mu[bp] for bp in D.ba_children[ba])
+        # https://github.com/JuliaLang/julia/issues/19398
+        #=
+        D.ba_mu[ba] = D.ba_rho[ba] + sum(D.mu[bp] for bp in D.ba_children[ba])
+        =#
+        sum_mu = 0.0
+        for bp in D.ba_children[ba]
+            sum_mu += D.mu[bp]
+        end
+        D.ba_mu[ba] = D.ba_rho[ba] + sum_mu
 
+        #=
         max_mu = maximum(D.ba_rho[ba] + sum(D.mu[bp] for bp in D.ba_children[ba]) for ba in D.children[b])
         max_l = maximum(D.ba_rho[ba] + sum(D.l[bp] for bp in D.ba_children[ba]) for ba in D.children[b])
+        =#
+        max_mu = -Inf
+        max_l = -Inf
+        for ba in D.children[b]
+            sum_mu = 0.0
+            sum_l = 0.0
+            for bp in D.ba_children[ba]
+                sum_mu += D.mu[bp]
+                sum_l += D.l[bp]
+            end
+            new_mu = D.ba_rho[ba] + sum_mu
+            new_l = D.ba_rho[ba] + sum_l
+            max_mu = max(max_mu, new_mu)
+            max_l = max(max_l, new_l)
+        end
 
         l_0 = D.l_0[b]
         D.mu[b] = max(l_0, max_mu)
@@ -75,9 +105,9 @@ function backup!(D::DESPOT, b::Int, p::DESPOTPlanner)
 end
 
 function next_best(D::DESPOT, b::Int, p::DESPOTPlanner)
-    ai = argmax(D.ba_mu[b])
+    ai = indmax(D.ba_mu[ba] for ba in D.children[b])
     ba = D.children[b][ai]
-    zi = argmax(excess_uncertainty(D, bp, p) for bp in D.ba_children[ba])
+    zi = indmax(excess_uncertainty(D, bp, p) for bp in D.ba_children[ba])
     return D.ba_children[ba][zi]
 end
 

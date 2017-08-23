@@ -1,18 +1,37 @@
-struct DESPOT{S, RS<:RandomStream}
+struct DESPOT{S,A}
     scenarios::Vector{Vector{Pair{Int,S}}}
     children::Vector{Vector{Int}} # to children *ba nodes*
-    parent::Vector{Int} # maps to parent *belief node*
-    parent_ba::Vector{Int} # maps to the parent *ba node*
+    parent_b::Vector{Int} # maps to parent *belief node*
+    parent::Vector{Int} # maps to the parent *ba node*
     Delta::Vector{Int}
     mu::Vector{Float64} # needed for ba_mu, find_blocker, explore termination, next_best
     l::Vector{Float64} # needed to select action
     l_0::Vector{Float64} # needed for find_blocker, backup of l and mu
 
-    ba_children{Vector{Vector{Int}}}
+    ba_children::Vector{Vector{Int}}
     ba_mu::Vector{Float64} # needed for next_best
     ba_rho::Vector{Float64} # needed for backup
+    ba_action::Vector{A} # only for first level for right now
+end
 
-    random_streams::RS
+function DESPOT(p::DESPOTPlanner, b_0)
+    root_scenarios = [i=>rand(p.rng, b_0) for i in 1:p.sol.K]
+    l_0, mu_0 = root_rwdu_bounds(p, ScenarioBelief(root_scenarios, p.rs))
+    O = obs_type(p.pomdp)
+    return DESPOT([root_scenarios],
+                  [Int[]],
+                  [0],
+                  [0],
+                  [0],
+                  [mu_0],
+                  [l_0],
+                  [l_0],
+                 
+                  Vector{Int}[],
+                  Float64[],
+                  Float64[],
+                  collect(iterator(actions(p.pomdp)))
+                 )
 end
 
 function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
@@ -29,15 +48,16 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
         rsum = 0.0
 
         for scen in D.scenarios[b]
-            rng = get_rng(D, b, first(scen))
-            sp, o, r = generate_sor(s, a, rng)
+            rng = get_rng(p.rs, first(scen), D.Delta[b])
+            s = last(scen)
+            sp, o, r = generate_sor(p.pomdp, s, a, rng)
             rsum += r
             bp = get(odict, o, 0)
             if bp == 0
                 bp = length(D.scenarios)+1
                 odict[o] = bp
+                push!(D.scenarios, Vector{Pair{Int, S}}())
                 push!(D.ba_children[ba], bp)
-                D.scenarios[bp] = Vector{Pair{Int, S}}()
             end
             push!(D.scenarios[bp], first(scen)=>sp)
         end
@@ -49,25 +69,44 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
         resize!(D, length(D.children) + nbps)
         for bp in values(odict)
             D.children[bp] = Int[]
-            D.parent[bp] = b
-            D.parent_ba[bp] = ba
+            D.parent_b[bp] = b
+            D.parent[bp] = ba
             D.Delta[bp] = D.Delta[b]+1
-            L_0, U_0 = bounds(p.bounds, belief_node)
-            l_0 = length(D.scenarios[bp])/p.sol.K * discount(p.pomdp)^D.Delta[bp] * L_0
+            l_0, mu_0 = rwdu_bounds(D, bp, p)
             D.l_0[bp] = l_0
             D.l[bp] = l_0
-            D.mu[bp] = max(l_0, length(D.scenarios[bp])/p.sol.K * discount(p.pomdp)^D.Delta[bp] * U_0)
+            D.mu[bp] = mu_0
         end
 
-        ba_mu[ba] = ba_rho[ba] + sum(D.mu[bp] for bp in D.ba_children[ba])
+        push!(D.ba_mu, D.ba_rho[ba] + sum(D.mu[bp] for bp in D.ba_children[ba]))
     end
 end
 
-function resize!(D::DESPOT, n::Int)
+get_belief(D::DESPOT, b::Int, rs::DESPOTRandomSource) = ScenarioBelief(D.scenarios[b], rs)
+
+function Base.resize!(D::DESPOT, n::Int)
     resize!(D.children, n)
+    resize!(D.parent_b, n)
     resize!(D.parent, n)
     resize!(D.Delta, n)
     resize!(D.mu, n)
     resize!(D.l, n)
-    resize!(D.E, n)
+    resize!(D.l_0, n)
+end
+
+"""
+Return initial values of the *regularized* weighted discounted utility bounds (l_0 and mu_0)
+"""
+function rwdu_bounds(D::DESPOT, b::Int, p::DESPOTPlanner)
+    L_0, U_0 = bounds(p.bounds, get_belief(D, b, p.rs))
+    l_0 = length(D.scenarios[b])/p.sol.K * discount(p.pomdp)^D.Delta[b] * L_0
+    mu_0 = max(l_0, length(D.scenarios[b])/p.sol.K * discount(p.pomdp)^D.Delta[b] * U_0)
+    return l_0, mu_0
+end
+
+function root_rwdu_bounds(p::DESPOTPlanner, b)
+    L_0, U_0 = bounds(p.bounds, b)
+    l_0 = L_0
+    mu_0 = max(l_0, U_0)
+    return l_0, mu_0
 end
