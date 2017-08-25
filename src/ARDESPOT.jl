@@ -3,6 +3,7 @@ module ARDESPOT
 using Parameters
 using CPUTime
 using ParticleFilters
+using POMDPToolbox
 
 importall POMDPs
 
@@ -12,10 +13,14 @@ export
 
     DESPOTRandomSource,
     MersenneSource,
+    FastMersenneSource,
+    SimpleMersenneSource,
+    ScenarioBelief,
 
     DESPOTBounds,
     IndependentBounds,
     FullyObservableValueUB,
+    DefaultPolicyLB,
 
     TreeView
 
@@ -34,9 +39,11 @@ abstract type DESPOTBounds end
     max_trials::Int                         = typemax(Int)
     bounds::DESPOTBounds                    = IndependentBounds(-1e6, 1e6)
     rng::AbstractRNG                        = Base.GLOBAL_RNG
-    random_source::DESPOTRandomSource       = MersenneSource(K,50,rng)
+    random_source::DESPOTRandomSource       = FastMersenneSource(K, rng)
 end
 
+include("scenario_belief.jl")
+include("default_policy_sim.jl")
 include("bounds.jl")
 
 struct DESPOTPlanner{P<:POMDP, B<:DESPOTBounds, RS<:DESPOTRandomSource, RNG<:AbstractRNG} <: Policy
@@ -49,7 +56,7 @@ end
 
 function DESPOTPlanner(sol::DESPOTSolver, pomdp::POMDP)
     bounds = init_bounds(sol.bounds, pomdp, sol)
-    return DESPOTPlanner(deepcopy(sol), pomdp, bounds, sol.random_source, sol.rng)
+    return DESPOTPlanner(deepcopy(sol), pomdp, bounds, deepcopy(sol.random_source), deepcopy(sol.rng))
 end
 
 include("tree.jl")
