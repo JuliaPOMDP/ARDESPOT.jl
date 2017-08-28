@@ -76,12 +76,13 @@ function check_consistency(rs::FastMersenneStream)
 end
 
 mutable struct FastMersenneSource <: DESPOTRandomSource
+    K::Int
+    advance::Int
     streams::Vector{FastMersenneStream}
 end
 
-function FastMersenneSource(K::Int, advance::Int, rng::AbstractRNG)
-    streams = collect(FastMersenneStream(advance, rng) for i in 1:K)
-    return FastMersenneSource(streams)
+function FastMersenneSource(K::Int, advance::Int)
+    return FastMersenneSource(K, advance, FastMersenneStream[])
 end
 
 get_stream(rs::FastMersenneSource, scenario::Int) = rs.streams[scenario]
@@ -93,12 +94,11 @@ function check_consistency(rs::FastMersenneSource)
     end
 end
 
-#=
-function srand(rs::FastMersenneSource, seed)
+function Base.srand(rs::FastMersenneSource, seed)
     mt = MersenneTwister(seed)
-
+    rs.streams = [FastMersenneStream(rs.advance, mt) for i in 1:rs.K]
+    return rs
 end
-=#
 
 
 

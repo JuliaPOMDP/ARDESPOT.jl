@@ -9,8 +9,8 @@ N = 50
 
 pomdp = BabyPOMDP()
 
-bounds = IndependentBounds(DefaultPolicyLB(FeedWhenCrying()), 0.0)
-# bounds = IndependentBounds(reward(pomdp, false, true)/(1-discount(pomdp)), 0.0)
+# bounds = IndependentBounds(DefaultPolicyLB(FeedWhenCrying()), 0.0)
+bounds = IndependentBounds(reward(pomdp, false, true)/(1-discount(pomdp)), 0.0)
 
 solver = DESPOTSolver(epsilon_0=0.1,
                       K=50,
@@ -20,7 +20,7 @@ solver = DESPOTSolver(epsilon_0=0.1,
                       max_trials=100,
                       rng=MersenneTwister(4),
                       # random_source=SimpleMersenneSource(50),
-                      random_source=FastMersenneSource(50, 10, MersenneTwister(10)),
+                      random_source=FastMersenneSource(50, 10),
                       # random_source=MersenneSource(50, 10, MersenneTwister(10))
                      )
 

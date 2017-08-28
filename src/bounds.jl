@@ -1,6 +1,6 @@
 # Upper and lower do not depend on each other (most cases)
 
-struct IndependentBounds{L, U} <: DESPOTBounds
+struct IndependentBounds{L, U}
     lower::L
     upper::U
 end

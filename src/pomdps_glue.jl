@@ -1,6 +1,8 @@
 solve(sol::DESPOTSolver, p::POMDP) = DESPOTPlanner(sol, p)
 
 function action(p::DESPOTPlanner, b)
+    srand(p.rs, rand(p.rng, UInt32))
+
     D = build_despot(p, b)
 
     check_consistency(p.rs)

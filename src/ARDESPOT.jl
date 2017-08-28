@@ -1,3 +1,4 @@
+__precompile__()
 module ARDESPOT
 
 using Parameters
@@ -15,21 +16,22 @@ export
     MersenneSource,
     FastMersenneSource,
     SimpleMersenneSource,
-    ScenarioBelief,
 
-    DESPOTBounds,
+    ScenarioBelief,
+    previous_obs,
+
     IndependentBounds,
     FullyObservableValueUB,
     DefaultPolicyLB,
+    bounds,
+    init_bounds,
 
     TreeView
 
 
 include("random.jl")
 
-abstract type DESPOTBounds end
-
-@with_kw mutable struct DESPOTSolver
+@with_kw mutable struct DESPOTSolver <: Solver
     epsilon_0::Float64                      = 0.0
     xi::Float64                             = 0.95
     K::Int                                  = 500
@@ -37,16 +39,16 @@ abstract type DESPOTBounds end
     lambda::Float64                         = 0.01
     T_max::Float64                          = 1.0
     max_trials::Int                         = typemax(Int)
-    bounds::DESPOTBounds                    = IndependentBounds(-1e6, 1e6)
+    bounds::Any                             = IndependentBounds(-1e6, 1e6)
     rng::AbstractRNG                        = Base.GLOBAL_RNG
-    random_source::DESPOTRandomSource       = FastMersenneSource(K, rng)
+    random_source::DESPOTRandomSource       = FastMersenneSource(K, 50)
 end
 
 include("scenario_belief.jl")
 include("default_policy_sim.jl")
 include("bounds.jl")
 
-struct DESPOTPlanner{P<:POMDP, B<:DESPOTBounds, RS<:DESPOTRandomSource, RNG<:AbstractRNG} <: Policy
+struct DESPOTPlanner{P<:POMDP, B, RS<:DESPOTRandomSource, RNG<:AbstractRNG} <: Policy
     sol::DESPOTSolver
     pomdp::P
     bounds::B

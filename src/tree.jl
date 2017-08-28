@@ -52,16 +52,18 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
         for scen in D.scenarios[b]
             rng = get_rng(p.rs, first(scen), D.Delta[b])
             s = last(scen)
-            sp, o, r = generate_sor(p.pomdp, s, a, rng)
-            rsum += r
-            bp = get(odict, o, 0)
-            if bp == 0
-                push!(D.scenarios, Vector{Pair{Int, S}}())
-                bp = length(D.scenarios)
-                odict[o] = bp
-                push!(D.ba_children[ba], bp)
+            if !isterminal(p.pomdp, s)
+                sp, o, r = generate_sor(p.pomdp, s, a, rng)
+                rsum += r
+                bp = get(odict, o, 0)
+                if bp == 0
+                    push!(D.scenarios, Vector{Pair{Int, S}}())
+                    bp = length(D.scenarios)
+                    odict[o] = bp
+                    push!(D.ba_children[ba], bp)
+                end
+                push!(D.scenarios[bp], first(scen)=>sp)
             end
-            push!(D.scenarios[bp], first(scen)=>sp)
         end
 
         rho = (rsum*discount(p.pomdp)^D.Delta[b]-length(D.scenarios[b])*p.sol.lambda)/p.sol.K
@@ -70,6 +72,8 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
         nbps = length(odict)
         resize!(D, length(D.children) + nbps)
         for (o, bp) in odict
+            D.obs[bp] = o
+
             D.children[bp] = Int[]
             D.parent_b[bp] = b
             D.parent[bp] = ba
@@ -78,7 +82,6 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
             D.mu[bp] = mu_0
             D.l[bp] = l_0
             D.l_0[bp] = l_0
-            D.obs[bp] = o
         end
 
         push!(D.ba_mu, D.ba_rho[ba] + sum(D.mu[bp] for bp in D.ba_children[ba]))
