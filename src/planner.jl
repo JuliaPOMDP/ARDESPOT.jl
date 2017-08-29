@@ -52,6 +52,7 @@ function find_blocker(D::DESPOT, b::Int, p::DESPOTPlanner)
             return bp
         else
             bp = D.parent_b[bp]
+            len += 1
         end
     end
     return 0 # no blocker
