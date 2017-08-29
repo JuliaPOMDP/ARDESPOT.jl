@@ -11,7 +11,8 @@ function TextTree(D::DESPOT)
     text = Vector{String}(len)
     for b in 1:lenb
         children[b] = D.children[b] .+ lenb
-        text[b] = @sprintf("l:%5.1f, μ:%5.1f, l₀:%5.1f, %3d scenarios",
+        text[b] = @sprintf("o:%5s l:%5.1f, μ:%5.1f, l₀:%5.1f, |Φ|:%3d",
+                           b==1 ? "<root>" : string(D.obs[b]),
                            D.l[b],
                            D.mu[b],
                            D.l_0[b],
@@ -19,7 +20,7 @@ function TextTree(D::DESPOT)
     end
     for ba in 1:lenba
         children[ba+lenb] = D.ba_children[ba]
-        text[ba+lenb] = @sprintf("μ:%5.1f, ρ:%5.1f", D.ba_mu[ba], D.ba_rho[ba])
+        text[ba+lenb] = @sprintf("a:%5s μ:%5.1f, ρ:%5.1f", D.ba_action[ba], D.ba_mu[ba], D.ba_rho[ba])
     end
     return TextTree(children, text)
 end
