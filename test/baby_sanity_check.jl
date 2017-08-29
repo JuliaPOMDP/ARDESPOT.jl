@@ -13,14 +13,14 @@ pomdp = BabyPOMDP()
 bounds = IndependentBounds(reward(pomdp, false, true)/(1-discount(pomdp)), 0.0)
 
 solver = DESPOTSolver(epsilon_0=0.1,
-                      K=50,
+                      K=100,
                       D=50,
                       bounds=bounds,
                       T_max=Inf,
-                      max_trials=100,
+                      max_trials=500,
                       rng=MersenneTwister(4),
                       # random_source=SimpleMersenneSource(50),
-                      random_source=FastMersenneSource(50, 10),
+                      random_source=FastMersenneSource(100, 10),
                       # random_source=MersenneSource(50, 10, MersenneTwister(10))
                      )
 
