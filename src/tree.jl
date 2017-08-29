@@ -12,13 +12,14 @@ struct DESPOT{S,A,O}
     ba_children::Vector{Vector{Int}}
     ba_mu::Vector{Float64} # needed for next_best
     ba_rho::Vector{Float64} # needed for backup
-    ba_action::Vector{A} # only for first level for right now
+    ba_action::Vector{A}
 end
 
 function DESPOT(p::DESPOTPlanner, b_0)
     root_scenarios = [i=>rand(p.rng, b_0) for i in 1:p.sol.K]
     l_0, mu_0 = root_rwdu_bounds(p, ScenarioBelief(root_scenarios, p.rs, 0, Nullable()))
     O = obs_type(p.pomdp)
+    A = action_type(p.pomdp)
     return DESPOT([root_scenarios],
                   [Int[]],
                   [0],
@@ -32,7 +33,7 @@ function DESPOT(p::DESPOTPlanner, b_0)
                   Vector{Int}[],
                   Float64[],
                   Float64[],
-                  collect(iterator(actions(p.pomdp)))
+                  A[]
                  )
 end
 
@@ -44,6 +45,7 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
 
     for a in iterator(actions(p.pomdp))
         push!(D.ba_children, Int[])
+        push!(D.ba_action, a)
         ba = length(D.ba_children)
         push!(D.children[b], ba)
         empty!(odict)

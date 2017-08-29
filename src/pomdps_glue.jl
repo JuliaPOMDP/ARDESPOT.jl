@@ -8,14 +8,16 @@ function action(p::DESPOTPlanner, b)
     check_consistency(p.rs)
 
     best_l = -Inf
-    local best_a::action_type(p.pomdp)
+    best_as = action_type(p.pomdp)[]
     for ba in D.children[1]
         l = mean(D.l[bnode] for bnode in D.ba_children[ba])
         if l >= best_l
             best_l = l
+            push!(best_as, D.ba_action[ba])
             best_a = D.ba_action[ba]
         end
     end
+    best_a = rand(p.rng, best_as) # best_as will usually only have one entry, but we want to break the tie randomly
     return best_a
 end
 

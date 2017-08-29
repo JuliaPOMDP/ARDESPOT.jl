@@ -8,7 +8,8 @@ using POMDPToolbox
 pomdp = BabyPOMDP()
 
 # FastMersenneSource
-rs = FastMersenneSource(10, MersenneTwister(7))
+rs = FastMersenneSource(10, 50)
+srand(rs, 7)
 mt = ARDESPOT.get_rng(rs, 3, 8)
 r1 = rand(mt)
 mt = ARDESPOT.get_rng(rs, 3, 8)
@@ -17,7 +18,8 @@ r2 = rand(mt)
 
 K = 10
 rng = MersenneTwister(14)
-rs = FastMersenneSource(K, MersenneTwister(7))
+rs = FastMersenneSource(K, 50)
+srand(rs, 10)
 b_0 = initial_state_distribution(pomdp)
 scenarios = [i=>rand(rng, b_0) for i in 1:K]
 b = ScenarioBelief(scenarios, rs, 0, Nullable(false))
@@ -33,22 +35,22 @@ bounds = IndependentBounds(reward(pomdp, true, false)/(1-discount(pomdp)), 0.0)
 solver = DESPOTSolver(bounds=bounds)
 planner = solve(solver, pomdp)
 hr = HistoryRecorder(max_steps=2)
-hist = simulate(hr, pomdp, planner)
+@time hist = simulate(hr, pomdp, planner)
 
 # policy lower bound
 bounds = IndependentBounds(DefaultPolicyLB(FeedWhenCrying()), 0.0)
 solver = DESPOTSolver(bounds=bounds)
 planner = solve(solver, pomdp)
 hr = HistoryRecorder(max_steps=2)
-hist = simulate(hr, pomdp, planner)
+@time hist = simulate(hr, pomdp, planner)
 
 # RewindingMersenneSource
 bounds = IndependentBounds(DefaultPolicyLB(FeedWhenCrying()), 0.0)
 solver = DESPOTSolver(bounds=bounds,
-                      random_source=FastMersenneSource(500, MersenneTwister(4)))
+                      random_source=FastMersenneSource(500, 50))
 planner = solve(solver, pomdp)
 hr = HistoryRecorder(max_steps=2)
-hist = simulate(hr, pomdp, planner)
+@time hist = simulate(hr, pomdp, planner)
 
 
 # Type stability 
@@ -70,3 +72,4 @@ D = @inferred ARDESPOT.build_despot(p, b0)
 @inferred ARDESPOT.backup!(D, 1, p)
 @inferred ARDESPOT.next_best(D, 1, p)
 @inferred ARDESPOT.excess_uncertainty(D, 1, p)
+@inferred action(p, b0)

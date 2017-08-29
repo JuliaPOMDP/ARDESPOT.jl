@@ -5,7 +5,7 @@ function build_despot(p::DESPOTPlanner, b_0)
     start = CPUtime_us()
 
     while D.mu[1]-D.l[1] > p.sol.epsilon_0 &&
-          # CPUtime_us()-start < p.sol.T_max*1e6 &&
+          CPUtime_us()-start < p.sol.T_max*1e6 &&
           trial <= p.sol.max_trials
         b = explore!(D, 1, p)
         backup!(D, b, p)

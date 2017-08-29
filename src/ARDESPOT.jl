@@ -58,7 +58,10 @@ end
 
 function DESPOTPlanner(sol::DESPOTSolver, pomdp::POMDP)
     bounds = init_bounds(sol.bounds, pomdp, sol)
-    return DESPOTPlanner(deepcopy(sol), pomdp, bounds, deepcopy(sol.random_source), deepcopy(sol.rng))
+    rng = deepcopy(sol.rng)
+    rs = deepcopy(sol.random_source)
+    srand(rs, rand(rng, UInt32))
+    return DESPOTPlanner(deepcopy(sol), pomdp, bounds, rs, rng)
 end
 
 include("tree.jl")
