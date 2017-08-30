@@ -108,6 +108,9 @@ Return initial values of the *regularized* weighted discounted utility bounds (l
 """
 function rwdu_bounds(D::DESPOT, b::Int, p::DESPOTPlanner)
     L_0, U_0 = bounds(p.bounds, p.pomdp, get_belief(D, b, p.rs))
+    if L_0 > U_0
+        warn("L_0 ($L_0) > U_0 ($U_0)")
+    end
     l_0 = length(D.scenarios[b])/p.sol.K * discount(p.pomdp)^D.Delta[b] * L_0
     mu_0 = max(l_0, length(D.scenarios[b])/p.sol.K * discount(p.pomdp)^D.Delta[b] * U_0)
     return l_0, mu_0
