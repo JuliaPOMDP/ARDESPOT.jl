@@ -28,10 +28,12 @@ function explore!(D::DESPOT, b::Int, p::DESPOTPlanner)
     return b
 end
 
+
 function prune!(D::DESPOT, b::Int, p::DESPOTPlanner)
+    x = b
     blocked = false
-    while b != 1
-        n = find_blocker(D, b, p)
+    while x != 1
+        n = find_blocker(D, x, p)
         if n > 0
             make_default!(D, n)
             backup!(D, n, p)
@@ -39,10 +41,36 @@ function prune!(D::DESPOT, b::Int, p::DESPOTPlanner)
         else
             break
         end
-        b = D.parent_b[b]
+        x = D.parent_b[x]
     end
     return blocked
 end
+
+# tried to match the C++ implementation
+#=
+function prune!(D::DESPOT, b::Int, p::DESPOTPlanner)
+    x = b
+    blocked = false
+    while x != 1
+        n = find_blocker(D, x, p)
+        if n > 0
+            if n == x
+                make_default!(D, x)
+            else
+                for sibling in D.ba_children[D.parent[x]]
+                    make_default!(D, sibling)
+                end
+            end
+            backup!(D, x, p)
+            blocked = true
+        else
+            break
+        end
+        x = D.parent_b[x]
+    end
+    return blocked
+end
+=#
 
 function find_blocker(D::DESPOT, b::Int, p::DESPOTPlanner)
     len = 1
