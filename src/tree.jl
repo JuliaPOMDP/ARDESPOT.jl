@@ -68,7 +68,8 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
             end
         end
 
-        rho = (rsum*discount(p.pomdp)^D.Delta[b]-length(D.scenarios[b])*p.sol.lambda)/p.sol.K
+        # rho = (rsum*discount(p.pomdp)^D.Delta[b]-length(D.scenarios[b])*p.sol.lambda)/p.sol.K
+        rho = rsum*discount(p.pomdp)^D.Delta[b]/p.sol.K-p.sol.lambda
         push!(D.ba_rho, rho)
 
         nbps = length(odict)
