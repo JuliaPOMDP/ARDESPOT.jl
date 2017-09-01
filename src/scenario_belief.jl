@@ -10,7 +10,5 @@ rand(rng::AbstractRNG, b::ScenarioBelief) = b.scenarios[rand(rng, 1:length(b.sce
 iterator(b::ScenarioBelief) = (last(p) for p in b.scenarios)
 previous_obs(b::ScenarioBelief) = b._obs
 
-init_bounds(bounds, pomdp, sol) = bounds
-
 initialize_belief(::PreviousObservationUpdater{T}, b::ScenarioBelief{S, Union{}}) where {S,T} = Nullable{T}()
 initialize_belief(::PreviousObservationUpdater{T}, b::ScenarioBelief{S, T}) where {S,T} = previous_obs(b)

@@ -1,3 +1,17 @@
+init_bounds(bounds, pomdp, sol) = bounds
+
+function bounds_sanity_check(pomdp::POMDP, sb::ScenarioBelief, L_0, U_0)
+    if L_0 > U_0
+        warn("L_0 ($L_0) > U_0 ($U_0)")
+    end
+    if all(isterminal(pomdp, s) for s in iterator(sb))
+        if L_0 != 0.0 || U_0 != 0.0
+            error(@sprintf("If all states are terminal, lower and upper bounds should be zero (L_0=%8.2g, U_0=%8.2g).", L_0, U_0))
+        end
+    end
+end
+
+
 # Upper and lower do not depend on each other (most cases)
 
 struct IndependentBounds{L, U}

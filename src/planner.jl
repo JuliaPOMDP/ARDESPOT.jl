@@ -49,7 +49,8 @@ function find_blocker(D::DESPOT, b::Int, p::DESPOTPlanner)
     len = 1
     bp = D.parent_b[b] # Note: unlike the normal use of bp, here bp is a parent following equation (12)
     while bp != 1
-        if D.mu[bp] - D.l_0[bp] <= p.sol.lambda * len
+        left_side_eq_12 = length(D.scenarios[bp])/p.sol.K*discount(p.pomdp)^D.Delta[bp]*D.U[b] - D.l_0[bp]
+        if left_side_eq_12 <= p.sol.lambda * len
             return bp
         else
             bp = D.parent_b[bp]
@@ -85,22 +86,28 @@ function backup!(D::DESPOT, b::Int, p::DESPOTPlanner)
         max_mu = maximum(D.ba_rho[ba] + sum(D.mu[bp] for bp in D.ba_children[ba]) for ba in D.children[b])
         max_l = maximum(D.ba_rho[ba] + sum(D.l[bp] for bp in D.ba_children[ba]) for ba in D.children[b])
         =#
+        max_U = -Inf
         max_mu = -Inf
         max_l = -Inf
         for ba in D.children[b]
+            weighted_sum_U = 0.0
             sum_mu = 0.0
             sum_l = 0.0
             for bp in D.ba_children[ba]
+                weighted_sum_U += length(D.scenarios[bp]) + D.U[bp]
                 sum_mu += D.mu[bp]
                 sum_l += D.l[bp]
             end
+            new_U = (D.ba_Rsum[ba] + discount(p.pomdp) * weighted_sum_U)/length(D.scenarios[b])
             new_mu = D.ba_rho[ba] + sum_mu
             new_l = D.ba_rho[ba] + sum_l
+            max_U = max(max_U, new_U)
             max_mu = max(max_mu, new_mu)
             max_l = max(max_l, new_l)
         end
 
         l_0 = D.l_0[b]
+        D.U[b] = max_U
         D.mu[b] = max(l_0, max_mu)
         D.l[b] = max(l_0, max_l)
     end
