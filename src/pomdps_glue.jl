@@ -10,7 +10,7 @@ function action(p::DESPOTPlanner, b)
     best_l = -Inf
     best_as = action_type(p.pomdp)[]
     for ba in D.children[1]
-        l = mean(D.l[bnode] for bnode in D.ba_children[ba])
+        l = D.ba_rho[ba] + sum(D.l[bnode] for bnode in D.ba_children[ba])
         if l > best_l
             best_l = l
             best_as = [D.ba_action[ba]]
