@@ -18,6 +18,7 @@ struct DESPOT{S,A,O}
 end
 
 function DESPOT(p::DESPOTPlanner, b_0)
+    S = state_type(p.pomdp)
     A = action_type(p.pomdp)
     O = obs_type(p.pomdp)
     root_scenarios = [i=>rand(p.rng, b_0) for i in 1:p.sol.K]
@@ -27,22 +28,22 @@ function DESPOT(p::DESPOTPlanner, b_0)
 
     bounds_sanity_check(p.pomdp, scenario_belief, L_0, U_0)
 
-    return DESPOT([root_scenarios],
-                  [Int[]],
-                  [0],
-                  [0],
-                  [0],
-                  [max(L_0, U_0 - p.sol.lambda)],
-                  [L_0],
-                  [U_0],
-                  [L_0],
-                  Vector{O}(1),
+    return DESPOT{S,A,O}([root_scenarios],
+                         [Int[]],
+                         [0],
+                         [0],
+                         [0],
+                         [max(L_0, U_0 - p.sol.lambda)],
+                         [L_0],
+                         [U_0],
+                         [L_0],
+                         Vector{O}(1),
                  
-                  Vector{Int}[],
-                  Float64[],
-                  Float64[],
-                  Float64[],
-                  A[]
+                         Vector{Int}[],
+                         Float64[],
+                         Float64[],
+                         Float64[],
+                         A[]
                  )
 end
 
