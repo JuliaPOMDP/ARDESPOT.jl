@@ -16,7 +16,7 @@ function build_despot(p::DESPOTPlanner, b_0)
 end
 
 function explore!(D::DESPOT, b::Int, p::DESPOTPlanner)
-    while D.Delta[b] <= p.sol.D && excess_uncertainty(D, b, p) > 0.0 && !prune!(D, b, p)
+    while D.Delta[b] <= p.sol.D && excess_uncertainty(D, b, p) > 0.0 # && !prune!(D, b, p)
         if isempty(D.children[b]) # a leaf
             expand!(D, b, p)
         end
@@ -49,7 +49,7 @@ function find_blocker(D::DESPOT, b::Int, p::DESPOTPlanner)
     len = 1
     bp = D.parent_b[b] # Note: unlike the normal use of bp, here bp is a parent following equation (12)
     while bp != 1
-        left_side_eq_12 = length(D.scenarios[bp])/p.sol.K*discount(p.pomdp)^D.Delta[bp]*D.U[b] - D.l_0[bp]
+        left_side_eq_12 = length(D.scenarios[bp])/p.sol.K*discount(p.pomdp)^D.Delta[bp]*D.U[bp] - D.l_0[bp]
         if left_side_eq_12 <= p.sol.lambda * len
             return bp
         else
@@ -94,7 +94,7 @@ function backup!(D::DESPOT, b::Int, p::DESPOTPlanner)
             sum_mu = 0.0
             sum_l = 0.0
             for bp in D.ba_children[ba]
-                weighted_sum_U += length(D.scenarios[bp]) + D.U[bp]
+                weighted_sum_U += length(D.scenarios[bp]) * D.U[bp]
                 sum_mu += D.mu[bp]
                 sum_l += D.l[bp]
             end

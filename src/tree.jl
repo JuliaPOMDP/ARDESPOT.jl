@@ -32,7 +32,7 @@ function DESPOT(p::DESPOTPlanner, b_0)
                   [0],
                   [0],
                   [0],
-                  [U_0 - p.sol.lambda],
+                  [max(L_0, U_0 - p.sol.lambda)],
                   [L_0],
                   [U_0],
                   [L_0],
@@ -76,7 +76,6 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
         ba = length(D.ba_children)
         push!(D.ba_action, a)
         push!(D.children[b], ba)
-        # rho = (rsum*discount(p.pomdp)^D.Delta[b]-length(D.scenarios[b])*p.sol.lambda)/p.sol.K
         rho = rsum*discount(p.pomdp)^D.Delta[b]/p.sol.K - p.sol.lambda
         push!(D.ba_rho, rho)
         push!(D.ba_Rsum, rsum)
@@ -95,8 +94,8 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
 
             bounds_sanity_check(p.pomdp, scenario_belief, L_0, U_0)
 
-            l_0 = length(D.scenarios[b])/p.sol.K * discount(p.pomdp)^D.Delta[b] * L_0
-            mu_0 = max(l_0, length(D.scenarios[b])/p.sol.K * discount(p.pomdp)^D.Delta[b] * U_0 - p.sol.lambda)
+            l_0 = length(D.scenarios[bp])/p.sol.K * discount(p.pomdp)^D.Delta[bp] * L_0
+            mu_0 = max(l_0, length(D.scenarios[bp])/p.sol.K * discount(p.pomdp)^D.Delta[bp] * U_0 - p.sol.lambda)
 
             D.mu[bp] = mu_0
             D.U[bp] = U_0
@@ -121,22 +120,3 @@ function Base.resize!(D::DESPOT, n::Int)
     resize!(D.l_0, n)
     resize!(D.obs, n)
 end
-
-#=
-"""
-Return initial values of the *regularized* weighted discounted utility bounds (l_0 and mu_0)
-"""
-function rwdu_bounds(D::DESPOT, b::Int, p::DESPOTPlanner)
-    L_0, U_0 = bounds(p.bounds, p.pomdp, get_belief(D, b, p.rs))
-    l_0 = length(D.scenarios[b])/p.sol.K * discount(p.pomdp)^D.Delta[b] * L_0
-    mu_0 = max(l_0, length(D.scenarios[b])/p.sol.K * discount(p.pomdp)^D.Delta[b] * U_0 - p.sol.lambda)
-    return l_0, mu_0
-end
-
-function root_rwdu_bounds(p::DESPOTPlanner, b)
-    L_0, U_0 = bounds(p.bounds, p.pomdp, b)
-    l_0 = L_0
-    mu_0 = max(l_0, U_0)
-    return l_0, mu_0
-end
-=#
