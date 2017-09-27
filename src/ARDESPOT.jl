@@ -5,6 +5,7 @@ using Parameters
 using CPUTime
 using ParticleFilters
 using POMDPToolbox
+using D3Trees
 
 importall POMDPs
 
@@ -24,9 +25,7 @@ export
     FullyObservableValueUB,
     DefaultPolicyLB,
     bounds,
-    init_bounds,
-
-    TreeView
+    init_bounds
 
 
 include("random.jl")
@@ -68,6 +67,7 @@ include("tree.jl")
 include("planner.jl")
 include("pomdps_glue.jl")
 
-include("tree_printing.jl")
+# include("tree_printing.jl")
+include("visualization.jl")
 
 end # module

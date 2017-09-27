@@ -21,7 +21,7 @@ function TextTree(D::DESPOT)
     end
     for ba in 1:lenba
         children[ba+lenb] = D.ba_children[ba]
-        text[ba+lenb] = @sprintf("a:%-5s μ:%6.2f, ρ:%6.2f", D.ba_action[ba], D.ba_mu[ba], D.ba_rho[ba])
+        text[ba+lenb] = @sprintf("a:%-5s l:%6.2f μ:%6.2f, ρ:%6.2f", D.ba_action[ba], ba_l(D, ba), D.ba_mu[ba], D.ba_rho[ba])
     end
     return TextTree(children, text)
 end

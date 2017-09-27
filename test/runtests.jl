@@ -74,5 +74,6 @@ D = @inferred ARDESPOT.build_despot(p, b0)
 @inferred ARDESPOT.excess_uncertainty(D, 1, p)
 @inferred action(p, b0)
 
-# printing
-println(TreeView(D, 1, 3))
+# visualization
+stringmime(MIME("text/html"), D)
+show(STDOUT, MIME("text/plain"), D)
