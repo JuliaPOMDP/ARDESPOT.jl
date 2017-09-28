@@ -1,4 +1,4 @@
-function D3Trees.D3Tree(D::DESPOT)
+function D3Trees.D3Tree(D::DESPOT; title="DESPOT Tree")
     lenb = length(D.children)
     lenba = length(D.ba_children)
     len = lenb + lenba
@@ -27,6 +27,7 @@ function D3Trees.D3Tree(D::DESPOT)
                 l: $(D.l[b])
                 μ: $(D.mu[b])
                 l₀: $(D.l_0[b])
+                $(length(D.children[b])) children
                 """
         link_width = 20.0*sqrt(length(D.scenarios[b])/K)
         link_style[b] = "stroke-width:$link_width"
@@ -45,9 +46,15 @@ function D3Trees.D3Tree(D::DESPOT)
                       ρ: $(D.ba_rho[ba])
                       l: $(ba_l(D, ba))
                       μ: $(D.ba_mu[ba])
+                      $(length(D.ba_children[ba])) children
                       """
     end
-    return D3Tree(children, text=text, tooltip=tt, link_style=link_style)
+    return D3Tree(children,
+                  text=text,
+                  tooltip=tt,
+                  link_style=link_style,
+                  title=title
+                 )
 end
 
 Base.show(io::IO, mime::MIME"text/html", D::DESPOT) = show(io, mime, D3Tree(D))
