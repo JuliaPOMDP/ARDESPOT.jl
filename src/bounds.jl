@@ -4,7 +4,7 @@ function bounds_sanity_check(pomdp::POMDP, sb::ScenarioBelief, L_0, U_0)
     if L_0 > U_0
         warn("L_0 ($L_0) > U_0 ($U_0)")
     end
-    if all(isterminal(pomdp, s) for s in iterator(sb))
+    if all(isterminal(pomdp, s) for s in particles(sb))
         if L_0 != 0.0 || U_0 != 0.0
             error(@sprintf("If all states are terminal, lower and upper bounds should be zero (L_0=%8.2g, U_0=%8.2g).", L_0, U_0))
         end
@@ -41,7 +41,7 @@ struct FullyObservableValueUB{P<:Union{Solver, Policy}}
     p::P
 end
 
-ubound(ub::FullyObservableValueUB, pomdp::POMDP, b::ScenarioBelief) = mean(value(p, s) for s in iterator(b)) # assumes that all are weighted equally
+ubound(ub::FullyObservableValueUB, pomdp::POMDP, b::ScenarioBelief) = mean(value(p, s) for s in particles(b)) # assumes that all are weighted equally
 
 function init_bound(ub::FullyObservableValueUB{S}, pomdp::POMDP, sol::DESPOTSolver) where S <: Solver
     return FullyObservableValueUB(solve(ub.p, pomdp))

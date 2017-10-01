@@ -9,6 +9,9 @@ using D3Trees
 
 importall POMDPs
 
+using BasicPOMCP # for ExceptionRethrow and NoDecision
+import BasicPOMCP.default_action
+
 export
     DESPOTSolver,
     DESPOTPlanner,
@@ -20,6 +23,9 @@ export
 
     ScenarioBelief,
     previous_obs,
+
+    default_action,
+    NoGap,
 
     IndependentBounds,
     FullyObservableValueUB,
@@ -39,6 +45,7 @@ include("random.jl")
     T_max::Float64                          = 1.0
     max_trials::Int                         = typemax(Int)
     bounds::Any                             = IndependentBounds(-1e6, 1e6)
+    default_action::Any                     = ExceptionRethrow()
     rng::AbstractRNG                        = Base.GLOBAL_RNG
     random_source::DESPOTRandomSource       = FastMersenneSource(K, 50)
 end
@@ -69,5 +76,6 @@ include("pomdps_glue.jl")
 
 # include("tree_printing.jl")
 include("visualization.jl")
+include("exceptions.jl")
 
 end # module

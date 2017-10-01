@@ -7,7 +7,7 @@ struct ScenarioBelief{S, O, RS<:DESPOTRandomSource}
 end
 
 rand(rng::AbstractRNG, b::ScenarioBelief) = b.scenarios[rand(rng, 1:length(b.scenarios))]
-iterator(b::ScenarioBelief) = (last(p) for p in b.scenarios)
+ParticleFilters.particles(b::ScenarioBelief) = (last(p) for p in b.scenarios)
 previous_obs(b::ScenarioBelief) = b._obs
 
 initialize_belief(::PreviousObservationUpdater{T}, b::ScenarioBelief{S, Union{}}) where {S,T} = Nullable{T}()
