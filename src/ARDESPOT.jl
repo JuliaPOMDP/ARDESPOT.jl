@@ -20,6 +20,7 @@ export
     MersenneSource,
     FastMersenneSource,
     SimpleMersenneSource,
+    MemorizingSource,
 
     ScenarioBelief,
     previous_obs,
@@ -35,6 +36,8 @@ export
 
 
 include("random.jl")
+include("random_2.jl")
+
 
 @with_kw mutable struct DESPOTSolver <: Solver
     epsilon_0::Float64                      = 0.0

@@ -74,6 +74,17 @@ D = @inferred ARDESPOT.build_despot(p, b0)
 @inferred ARDESPOT.excess_uncertainty(D, 1, p)
 @inferred action(p, b0)
 
+
+bounds = IndependentBounds(reward(pomdp, true, false)/(1-discount(pomdp)), 0.0)
+rng = MersenneTwister(4)
+solver = DESPOTSolver(epsilon_0=0.1,
+                      bounds=bounds,
+                      rng=rng,
+                      random_source=MemorizingSource(500, rng)
+                     )
+p = solve(solver, pomdp)
+a = action(p, initial_state_distribution(pomdp))
+
 # visualization
 stringmime(MIME("text/html"), D)
 show(STDOUT, MIME("text/plain"), D)
