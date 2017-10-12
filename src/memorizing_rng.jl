@@ -14,7 +14,7 @@ MemorizingRNG(source) = MemorizingRNG(Float64[], 0, source)
 @inline mr_empty(r::MemorizingRNG) = r.idx == length(r.vals)
 @inline mr_pop!(r::MemorizingRNG) = @inbounds return r.vals[r.idx+=1]
 
-@inline reserve_1(r::MemorizingRNG) = mr_empty(r) && gen_rand(r, 1)
+@inline reserve_1(r::MemorizingRNG) = mr_empty(r) && gen_rand!(r, 1)
 
 # precondition: !mr_empty(r)
 @inline rand_inbounds(r::MemorizingRNG, ::Type{Close1Open2}) = mr_pop!(r)
@@ -27,9 +27,13 @@ function rand(r::MemorizingRNG, ::Type{I}) where I <: FloatInterval
     return rand_inbounds(r, I)
 end
 
-function gen_rand(r::MemorizingRNG{MersenneTwister}, n::Integer)
+function gen_rand!(r::MemorizingRNG{MersenneTwister}, n::Integer)
     orig = length(r.vals)
     new = orig+n
     resize!(r.vals, new)
     Base.Random.rand_AbstractArray_Float64!(r.source, view(r.vals, orig+1:new), new-orig, Close1Open2)
+end
+
+function gen_one!(r::MemorizingRNG{MersenneTwister})
+    push!(r.vals, rand(r.source, Close1Open2))
 end

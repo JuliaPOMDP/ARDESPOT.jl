@@ -80,10 +80,12 @@ rng = MersenneTwister(4)
 solver = DESPOTSolver(epsilon_0=0.1,
                       bounds=bounds,
                       rng=rng,
-                      random_source=MemorizingSource(500, rng)
+                      random_source=MemorizingSource(500, 90, rng)
                      )
 p = solve(solver, pomdp)
 a = action(p, initial_state_distribution(pomdp))
+
+include("random_2.jl")
 
 # visualization
 stringmime(MIME("text/html"), D)

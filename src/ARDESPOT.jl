@@ -21,6 +21,7 @@ export
     FastMersenneSource,
     SimpleMersenneSource,
     MemorizingSource,
+    MemorizingRNG,
 
     ScenarioBelief,
     previous_obs,
