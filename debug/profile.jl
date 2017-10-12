@@ -21,6 +21,7 @@ solver = DESPOTSolver(epsilon_0=0.0,
                       # random_source=FastMersenneSource(500, 10)
                       random_source=MemorizingSource(500, 90, MersenneTwister(5))
                      )
+
 p = solve(solver, pomdp)
 b0 = initial_state_distribution(pomdp)
 println("starting first")
@@ -30,7 +31,7 @@ println("starting first")
 @time ARDESPOT.build_despot(p, b0)
 
 Profile.clear()
-D = @profile for i in 1:10
+D = @profile for i in 1:50
     ARDESPOT.build_despot(p, b0)
 end
 ProfileView.view()

@@ -1,18 +1,19 @@
 importall Base.Random
-import Base.Random: CloseOpen, Close1Open2, FloatInterval
+import Base.Random: CloseOpen, Close1Open2, FloatInterval, MTCacheLength
 
-mutable struct MemorizingRNG{S, V<:AbstractVector{Float64}} <: AbstractRNG
-    vals::V
+mutable struct MemorizingRNG{S} <: AbstractRNG
+    memory::Vector{Float64}
+    range::UnitRange{Int64}
     idx::Int
     source::S
 end
 
-MemorizingRNG(source) = MemorizingRNG(Float64[], 0, source)
+MemorizingRNG(source) = MemorizingRNG(Float64[], 1:0, 0, source)
 
 # Low level API (copied from MersenneTwister)
-@inline mr_avail(r::MemorizingRNG) = length(r.vals) - r.idx
-@inline mr_empty(r::MemorizingRNG) = r.idx == length(r.vals)
-@inline mr_pop!(r::MemorizingRNG) = @inbounds return r.vals[r.idx+=1]
+@inline mr_avail(r::MemorizingRNG) = last(r.range) - r.idx
+@inline mr_empty(r::MemorizingRNG) = r.idx == last(r.range)
+@inline mr_pop!(r::MemorizingRNG) = @inbounds return r.memory[r.idx+=1]
 
 @inline reserve_1(r::MemorizingRNG) = mr_empty(r) && gen_rand!(r, 1)
 
@@ -28,12 +29,13 @@ function rand(r::MemorizingRNG, ::Type{I}) where I <: FloatInterval
 end
 
 function gen_rand!(r::MemorizingRNG{MersenneTwister}, n::Integer)
-    orig = length(r.vals)
-    new = orig+n
-    resize!(r.vals, new)
-    Base.Random.rand_AbstractArray_Float64!(r.source, view(r.vals, orig+1:new), new-orig, Close1Open2)
-end
-
-function gen_one!(r::MemorizingRNG{MersenneTwister})
-    push!(r.vals, rand(r.source, Close1Open2))
+    len = length(r.memory)
+    if len < r.idx + n
+        resize!(r.memory, len+MTCacheLength)
+        Base.Random.gen_rand(r.source) # could be faster to use dsfmt_fill_array_close1_open2
+        r.memory[len+1:end] = r.source.vals
+        Base.Random.mt_setempty!(r.source)
+    end
+    r.range = 1:length(r.memory)
+    return r
 end

@@ -7,29 +7,22 @@ mutable struct MemorizingSource{RNG<:AbstractRNG} <: DESPOTRandomSource
     memory::Vector{Float64}
     ranges::Matrix{UnitRange{Int64}}
     furthest::Int
-    head::MemorizingRNG{MemorizingSource{RNG}, SubArray{Float64,1,Array{Float64,1},Tuple{UnitRange{Int64}},true}}
-
-    MemorizingSource{RNG}(rng, memory, ranges, furthest) where RNG = new(rng, memory, ranges, furthest)
 end
 
 function MemorizingSource(K::Int, depth::Int, rng::AbstractRNG)
     memory = Float64[]
-    ranges = fill(0:0, K, depth)
+    ranges = fill(0:0, depth, K)
     return MemorizingSource{typeof(rng)}(rng, memory, ranges, 0)
 end
 
 function get_rng(s::MemorizingSource, scenario::Int, depth::Int)
-    range = s.ranges[scenario, depth+1]
+    range = s.ranges[depth+1, scenario]
     new = false
     if range == 0:0
         range = s.furthest+1:s.furthest
         new = true
     end
-    rng = MemorizingRNG(view(s.memory, range), 0, s)
-    if new
-        s.head = rng
-    end
-    return rng
+    return MemorizingRNG(s.memory, range, 0, s)
 end
 
 function srand(s::MemorizingSource, seed)
@@ -41,7 +34,7 @@ end
 
 function gen_rand!(r::MemorizingRNG{MemorizingSource{MersenneTwister}}, n::Integer)
     s = r.source
-    if r === s.head
+    if last(r.range) == s.furthest
         orig = length(s.memory)
         if orig < s.furthest + n
             resize!(s.memory, orig+MTCacheLength)
@@ -50,7 +43,7 @@ function gen_rand!(r::MemorizingRNG{MemorizingSource{MersenneTwister}}, n::Integ
             Base.Random.mt_setempty!(s.rng)
         end
         s.furthest += n
-        r.vals = view(s.memory, first(first(r.vals.indexes)):s.furthest)
+        r.range = first(r.range):last(r.range+n)
     else
         error("tried to gen_rand on an rng that is not the head")
     end

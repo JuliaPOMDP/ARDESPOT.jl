@@ -1,4 +1,4 @@
-rng = MemorizingRNG(Float64[], 0, MersenneTwister(12))
+rng = MemorizingRNG(MersenneTwister(12))
 
 a = rand(rng)
 rand(rng)
