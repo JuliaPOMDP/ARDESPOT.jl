@@ -13,30 +13,39 @@ function MemorizingSource(K::Int, depth::Int, rng::AbstractRNG)
     RNG = typeof(rng)
     memory = Float64[]
     rngs = Matrix{MemorizingRNG{MemorizingSource{RNG}}}(depth, K)
-    return MemorizingSource{RNG}(rng, memory, rng, 0)
+    src = MemorizingSource{RNG}(rng, memory, rngs, 0)
+    for i in 1:K
+        for j in 1:depth
+            rngs[j, i] = MemorizingRNG(src.memory, 1, 0, 0, src)
+        end
+    end
+    return src
 end
 
 function get_rng(s::MemorizingSource, scenario::Int, depth::Int)
-    if isassigned(s.rngs, depth+1, scenario)
-        rng = s.rngs
-    else
-    range = s.ranges[depth+1, scenario]
-    if range == 0:0
-        range = s.furthest+1:s.furthest
+    rng = s.rngs[depth+1, scenario]
+    if rng.finish == 0
+        rng.start = s.furthest+1
+        rng.finish = s.furthest
     end
-    return MemorizingRNG(s.memory, range, 0, s)
+    rng.idx = rng.start - 1
+    return rng
 end
 
 function srand(s::MemorizingSource, seed)
     srand(s.rng, seed)
-    fill!(s.ranges, 0:0)
     resize!(s.memory, 0)
+    for i in size(s.rngs, 2)
+        for j in size(s.rngs, 1)
+            s.rngs[j, i] = MemorizingRNG(s.memory, 1, 0, 0, s)
+        end
+    end
     return s
 end
 
 function gen_rand!(r::MemorizingRNG{MemorizingSource{MersenneTwister}}, n::Integer)
     s = r.source
-    if last(r.range) == s.furthest
+    if r.finish == s.furthest
         orig = length(s.memory)
         if orig < s.furthest + n
             resize!(s.memory, orig+MTCacheLength)
@@ -45,7 +54,7 @@ function gen_rand!(r::MemorizingRNG{MemorizingSource{MersenneTwister}}, n::Integ
             Base.Random.mt_setempty!(s.rng)
         end
         s.furthest += n
-        r.range = first(r.range):last(r.range+n)
+        r.finish += n
     else
         error("tried to gen_rand on an rng that is not the head")
     end
