@@ -31,7 +31,7 @@ println("starting first")
 @time ARDESPOT.build_despot(p, b0)
 
 Profile.clear()
-D = @profile for i in 1:50
+D = @profile for i in 1:20
     ARDESPOT.build_despot(p, b0)
 end
 ProfileView.view()

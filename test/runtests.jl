@@ -24,10 +24,15 @@ b_0 = initial_state_distribution(pomdp)
 scenarios = [i=>rand(rng, b_0) for i in 1:K]
 b = ScenarioBelief(scenarios, rs, 0, Nullable(false))
 pol = FeedWhenCrying()
-up = updater(pol)
-sim = ARDESPOT.ScenarioSimulator(rs, 7, 0, 100)
-r1 = simulate(sim, pomdp, pol, up, b, false)
-r2 = simulate(sim, pomdp, pol, up, b, false)
+r1 = ARDESPOT.branching_sim(pomdp, pol, b, 10)
+r2 = ARDESPOT.branching_sim(pomdp, pol, b, 10)
+@test r1 == r2
+
+scenarios = [1=>rand(rng, b_0)]
+b = ScenarioBelief(scenarios, rs, 0, Nullable(false))
+pol = FeedWhenCrying()
+r1 = ARDESPOT.rollout(pomdp, pol, b, 10)
+r2 = ARDESPOT.rollout(pomdp, pol, b, 10)
 @test r1 == r2
 
 # constant bounds

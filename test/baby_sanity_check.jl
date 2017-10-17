@@ -9,8 +9,8 @@ N = 50
 
 pomdp = BabyPOMDP()
 
-# bounds = IndependentBounds(DefaultPolicyLB(FeedWhenCrying()), 0.0)
-bounds = IndependentBounds(reward(pomdp, false, true)/(1-discount(pomdp)), 0.0)
+bounds = IndependentBounds(DefaultPolicyLB(FeedWhenCrying()), 0.0)
+# bounds = IndependentBounds(reward(pomdp, false, true)/(1-discount(pomdp)), 0.0)
 
 solver = DESPOTSolver(epsilon_0=0.1,
                       K=100,
