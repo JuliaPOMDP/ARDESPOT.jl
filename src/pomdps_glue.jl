@@ -8,8 +8,8 @@ function action(p::DESPOTPlanner, b)
 
         check_consistency(p.rs)
 
-        if isempty(D.children[1]) && D.U[1] == D.l_0[1]
-            throw(NoGap(D.U[1]))
+        if isempty(D.children[1]) && D.U[1] <= D.l_0[1]
+            throw(NoGap(D.l_0[1]))
         end
 
         best_l = -Inf
@@ -23,6 +23,7 @@ function action(p::DESPOTPlanner, b)
                 push!(best_as, D.ba_action[ba])
             end
         end
+
         return rand(p.rng, best_as)::action_type(p.pomdp) # best_as will usually only have one entry, but we want to break the tie randomly
     catch ex
         return default_action(p.sol.default_action, b, ex)::action_type(p.pomdp)

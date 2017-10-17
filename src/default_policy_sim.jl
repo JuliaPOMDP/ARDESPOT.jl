@@ -11,16 +11,18 @@ function branching_sim(pomdp::POMDP, policy::Policy, b::ScenarioBelief, steps::I
 
     r_sum = 0.0
     for (k, s) in b.scenarios
-        rng = get_rng(b.random_source, k, b.depth)
-        sp, o, r = generate_sor(pomdp, s, a, rng)
+        if !isterminal(pomdp, s)
+            rng = get_rng(b.random_source, k, b.depth)
+            sp, o, r = generate_sor(pomdp, s, a, rng)
 
-        if haskey(odict, o)
-            push!(odict[o], k=>sp)
-        else
-            odict[o] = [k=>sp]
+            if haskey(odict, o)
+                push!(odict[o], k=>sp)
+            else
+                odict[o] = [k=>sp]
+            end
+
+            r_sum += r
         end
-
-        r_sum += r
     end
 
     next_r = 0.0

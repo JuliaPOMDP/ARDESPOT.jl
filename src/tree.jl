@@ -26,7 +26,9 @@ function DESPOT(p::DESPOTPlanner, b_0)
     scenario_belief = ScenarioBelief(root_scenarios, p.rs, 0, Nullable{O}())
     L_0, U_0 = bounds(p.bounds, p.pomdp, scenario_belief)
 
-    bounds_sanity_check(p.pomdp, scenario_belief, L_0, U_0)
+    if p.sol.bounds_warnings
+        bounds_sanity_check(p.pomdp, scenario_belief, L_0, U_0)
+    end
 
     return DESPOT{S,A,O}([root_scenarios],
                          [Int[]],
@@ -93,7 +95,9 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
             scenario_belief = get_belief(D, bp, p.rs)
             L_0, U_0 = bounds(p.bounds, p.pomdp, scenario_belief)
 
-            bounds_sanity_check(p.pomdp, scenario_belief, L_0, U_0)
+            if p.sol.bounds_warnings
+                bounds_sanity_check(p.pomdp, scenario_belief, L_0, U_0)
+            end
 
             l_0 = length(D.scenarios[bp])/p.sol.K * discount(p.pomdp)^D.Delta[bp] * L_0
             mu_0 = max(l_0, length(D.scenarios[bp])/p.sol.K * discount(p.pomdp)^D.Delta[bp] * U_0 - p.sol.lambda)

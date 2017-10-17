@@ -52,6 +52,7 @@ include("random_2.jl")
     default_action::Any                     = ExceptionRethrow()
     rng::AbstractRNG                        = Base.GLOBAL_RNG
     random_source::DESPOTRandomSource       = FastMersenneSource(K, 50)
+    bounds_warnings::Bool                   = true
 end
 
 include("scenario_belief.jl")
