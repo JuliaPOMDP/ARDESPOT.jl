@@ -3,6 +3,10 @@ function branching_sim(pomdp::POMDP, policy::Policy, b::ScenarioBelief, steps::I
     O = obs_type(pomdp)
     odict = Dict{O, Vector{Pair{Int, S}}}()
 
+    if steps <= 0
+        return 0.0
+    end
+
     a = action(policy, b)
 
     r_sum = 0.0
