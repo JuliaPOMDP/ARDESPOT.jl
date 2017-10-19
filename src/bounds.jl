@@ -1,4 +1,6 @@
 init_bounds(bounds, pomdp, sol) = bounds
+bounds(f::Function, pomdp::POMDP, b::ScenarioBelief) = f(pomdp, b)
+bounds(t::Tuple, pomdp::POMDP, b::ScenarioBelief) = (lbound(t[1], pomdp, b), ubound(t[2], pomdp, b))
 
 function bounds_sanity_check(pomdp::POMDP, sb::ScenarioBelief, L_0, U_0)
     if L_0 > U_0
@@ -19,7 +21,7 @@ struct IndependentBounds{L, U}
     upper::U
 end
 
-bounds(bounds::IndependentBounds, pomdp, b::ScenarioBelief) = (lbound(bounds.lower, pomdp, b), ubound(bounds.upper, pomdp, b))
+bounds(bounds::IndependentBounds, pomdp::POMDP, b::ScenarioBelief) = (lbound(bounds.lower, pomdp, b), ubound(bounds.upper, pomdp, b))
 function init_bounds(bounds::IndependentBounds, pomdp::POMDP, sol::DESPOTSolver) 
     return IndependentBounds(init_bound(bounds.lower, pomdp, sol),
                              init_bound(bounds.upper, pomdp, sol))
@@ -36,7 +38,6 @@ lbound(f::Function, pomdp, b) = f(pomdp, b)
 
 
 # Value if Fully Observed Under a Policy
-
 struct FullyObservableValueUB{P<:Union{Solver, Policy}}
     p::P
 end

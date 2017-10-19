@@ -7,13 +7,14 @@ mutable struct MemorizingSource{RNG<:AbstractRNG} <: DESPOTRandomSource
     memory::Vector{Float64}
     rngs::Matrix{MemorizingRNG{MemorizingSource{RNG}}}
     furthest::Int
+    min_reserve::Int
 end
 
-function MemorizingSource(K::Int, depth::Int, rng::AbstractRNG)
+function MemorizingSource(K::Int, depth::Int, rng::AbstractRNG; min_reserve=0)
     RNG = typeof(rng)
     memory = Float64[]
     rngs = Matrix{MemorizingRNG{MemorizingSource{RNG}}}(depth, K)
-    src = MemorizingSource{RNG}(rng, memory, rngs, 0)
+    src = MemorizingSource{RNG}(rng, memory, rngs, 0, min_reserve)
     for i in 1:K
         for j in 1:depth
             rngs[j, i] = MemorizingRNG(src.memory, 1, 0, 0, src)
@@ -26,7 +27,9 @@ function get_rng(s::MemorizingSource, scenario::Int, depth::Int)
     rng = s.rngs[depth+1, scenario]
     if rng.finish == 0
         rng.start = s.furthest+1
+        rng.idx = rng.start - 1
         rng.finish = s.furthest
+        reserve(rng, s.min_reserve)
     end
     rng.idx = rng.start - 1
     return rng
@@ -40,6 +43,7 @@ function srand(s::MemorizingSource, seed)
             s.rngs[j, i] = MemorizingRNG(s.memory, 1, 0, 0, s)
         end
     end
+    s.furthest = 0
     return s
 end
 
@@ -48,6 +52,7 @@ function gen_rand!(r::MemorizingRNG{MemorizingSource{MersenneTwister}}, n::Integ
     if r.finish == s.furthest
         orig = length(s.memory)
         if orig < s.furthest + n
+            @assert n <= MTCacheLength
             resize!(s.memory, orig+MTCacheLength)
             Base.Random.gen_rand(s.rng) # could be faster to use dsfmt_fill_array_close1_open2
             s.memory[orig+1:end] = s.rng.vals
@@ -56,7 +61,16 @@ function gen_rand!(r::MemorizingRNG{MemorizingSource{MersenneTwister}}, n::Integ
         s.furthest += n
         r.finish += n
     else
-        error("tried to gen_rand on an rng that is not the head")
+        error("""
+              Tried to gen_rand on an rng that is not the head.
+              
+              r.start = $(r.start)
+              r.finish = $(r.finish)
+              r.idx = $(r.idx)
+              n = $n
+
+              Try using MemorizingSource(..., min_reserve=$(r.finish+n-r.start+1)) (or larger).
+              """)
     end
     return nothing
 end

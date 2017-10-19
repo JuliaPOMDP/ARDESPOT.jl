@@ -17,6 +17,7 @@ MemorizingRNG(source) = MemorizingRNG(Float64[], 1, 0, 0, source)
 @inline mr_pop!(r::MemorizingRNG) = @inbounds return r.memory[r.idx+=1]
 
 @inline reserve_1(r::MemorizingRNG) = mr_empty(r) && gen_rand!(r, 1)
+@inline reserve(r::MemorizingRNG, n::Integer) = mr_avail(r) < n && gen_rand!(r, n)
 
 # precondition: !mr_empty(r)
 @inline rand_inbounds(r::MemorizingRNG, ::Type{Close1Open2}) = mr_pop!(r)

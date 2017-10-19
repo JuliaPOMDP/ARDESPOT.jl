@@ -36,7 +36,7 @@ r2 = ARDESPOT.rollout(pomdp, pol, b, 10)
 @test r1 == r2
 
 # constant bounds
-bounds = IndependentBounds(reward(pomdp, true, false)/(1-discount(pomdp)), 0.0)
+bounds = (reward(pomdp, true, false)/(1-discount(pomdp)), 0.0)
 solver = DESPOTSolver(bounds=bounds)
 planner = solve(solver, pomdp)
 hr = HistoryRecorder(max_steps=2)
