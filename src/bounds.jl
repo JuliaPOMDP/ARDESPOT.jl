@@ -4,7 +4,7 @@ bounds(t::Tuple, pomdp::POMDP, b::ScenarioBelief) = (lbound(t[1], pomdp, b), ubo
 
 function bounds_sanity_check(pomdp::POMDP, sb::ScenarioBelief, L_0, U_0)
     if L_0 > U_0
-        warn("L_0 ($L_0) > U_0 ($U_0)")
+        warn("L_0 ($L_0) > U_0 ($U_0)   |ϕ| = $(length(sb.scenarios))")
     end
     if all(isterminal(pomdp, s) for s in particles(sb))
         if L_0 != 0.0 || U_0 != 0.0
@@ -69,7 +69,7 @@ end
 
 function init_bound(lb::DefaultPolicyLB{S}, pomdp::POMDP, sol::DESPOTSolver) where S <: Solver
     policy = solve(lb.policy, pomdp)
-    return init_bound(DefaultPolicyLB(policy, Nullable(lb.max_depth)), pomdp, sol)
+    return init_bound(DefaultPolicyLB(policy, lb.max_depth), pomdp, sol)
 end
 
 function init_bound(lb::DefaultPolicyLB{P}, pomdp::POMDP, sol::DESPOTSolver) where P <: Policy

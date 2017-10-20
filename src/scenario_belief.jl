@@ -1,4 +1,4 @@
-struct ScenarioBelief{S, O, RS<:DESPOTRandomSource}
+struct ScenarioBelief{S, O, RS<:DESPOTRandomSource} <: AbstractParticleBelief{S}
     scenarios::Vector{Pair{Int,S}}
     random_source::RS
     depth::Int

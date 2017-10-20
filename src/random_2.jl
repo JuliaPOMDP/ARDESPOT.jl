@@ -13,10 +13,10 @@ end
 function MemorizingSource(K::Int, depth::Int, rng::AbstractRNG; min_reserve=0)
     RNG = typeof(rng)
     memory = Float64[]
-    rngs = Matrix{MemorizingRNG{MemorizingSource{RNG}}}(depth, K)
+    rngs = Matrix{MemorizingRNG{MemorizingSource{RNG}}}(depth+1, K)
     src = MemorizingSource{RNG}(rng, memory, rngs, 0, min_reserve)
     for i in 1:K
-        for j in 1:depth
+        for j in 1:depth+1
             rngs[j, i] = MemorizingRNG(src.memory, 1, 0, 0, src)
         end
     end
@@ -69,7 +69,7 @@ function gen_rand!(r::MemorizingRNG{MemorizingSource{MersenneTwister}}, n::Integ
               r.idx = $(r.idx)
               n = $n
 
-              Try using MemorizingSource(..., min_reserve=$(r.finish+n-r.start+1)) (or larger).
+              Either generate all random numbers at the beginning of each generate_x() or rand() function (i.e. not inside of if branches), or try using MemorizingSource(..., min_reserve=$(r.finish+n-r.start+1)) (or larger) to reserve space for memory.
               """)
     end
     return nothing
