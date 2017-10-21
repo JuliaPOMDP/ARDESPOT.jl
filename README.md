@@ -6,7 +6,7 @@
 
 [![codecov.io](http://codecov.io/github/zsunberg/ARDESPOT.jl/coverage.svg?branch=master)](http://codecov.io/github/zsunberg/ARDESPOT.jl?branch=master)
 
-Tried to match the pseudocode from this paper: http://bigbird.comp.nus.edu.sg/m2ap/wordpress/wp-content/uploads/2017/08/jair14.pdf as closely as possible. Look their for definitions of all symbols.
+Tried to match the pseudocode from this paper: http://bigbird.comp.nus.edu.sg/m2ap/wordpress/wp-content/uploads/2017/08/jair14.pdf as closely as possible. Look there for definitions of all symbols.
 
 Problems use the [POMDPs.jl generative interface](https://github.com/JuliaPOMDP/POMDPs.jl).
 
