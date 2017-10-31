@@ -27,7 +27,7 @@ MemorizingRNG(source) = MemorizingRNG(Float64[], 1, 0, 0, source)
 
 function rand(r::MemorizingRNG, ::Type{I}) where I <: FloatInterval
     reserve_1(r)
-    return rand_inbounds(r, I)
+    rand_inbounds(r, I)
 end
 
 function gen_rand!(r::MemorizingRNG{MersenneTwister}, n::Integer)

@@ -8,13 +8,15 @@ mutable struct MemorizingSource{RNG<:AbstractRNG} <: DESPOTRandomSource
     rngs::Matrix{MemorizingRNG{MemorizingSource{RNG}}}
     furthest::Int
     min_reserve::Int
+    move_count::Int
+    move_warning::Bool
 end
 
-function MemorizingSource(K::Int, depth::Int, rng::AbstractRNG; min_reserve=0)
+function MemorizingSource(K::Int, depth::Int, rng::AbstractRNG; min_reserve=0, move_warning=true)
     RNG = typeof(rng)
     memory = Float64[]
     rngs = Matrix{MemorizingRNG{MemorizingSource{RNG}}}(depth+1, K)
-    src = MemorizingSource{RNG}(rng, memory, rngs, 0, min_reserve)
+    src = MemorizingSource{RNG}(rng, memory, rngs, 0, min_reserve, 0, move_warning)
     for i in 1:K
         for j in 1:depth+1
             rngs[j, i] = MemorizingRNG(src.memory, 1, 0, 0, src)
@@ -38,39 +40,53 @@ end
 function srand(s::MemorizingSource, seed)
     srand(s.rng, seed)
     resize!(s.memory, 0)
-    for i in size(s.rngs, 2)
-        for j in size(s.rngs, 1)
+    for i in 1:size(s.rngs, 2)
+        for j in 1:size(s.rngs, 1)
             s.rngs[j, i] = MemorizingRNG(s.memory, 1, 0, 0, s)
         end
     end
     s.furthest = 0
+    s.move_count = 0
     return s
 end
 
 function gen_rand!(r::MemorizingRNG{MemorizingSource{MersenneTwister}}, n::Integer)
     s = r.source
-    if r.finish == s.furthest
-        orig = length(s.memory)
-        if orig < s.furthest + n
-            @assert n <= MTCacheLength
-            resize!(s.memory, orig+MTCacheLength)
-            Base.Random.gen_rand(s.rng) # could be faster to use dsfmt_fill_array_close1_open2
-            s.memory[orig+1:end] = s.rng.vals
-            Base.Random.mt_setempty!(s.rng)
+    if r.finish != s.furthest # we need to move the memory to the end
+        len = r.finish - r.start + 1
+        if length(s.memory) < s.furthest + len
+            resize!(s.memory, s.furthest + len)
         end
-        s.furthest += n
-        r.finish += n
-    else
-        error("""
-              Tried to gen_rand on an rng that is not the head.
-              
-              r.start = $(r.start)
-              r.finish = $(r.finish)
-              r.idx = $(r.idx)
-              n = $n
-
-              Either generate all random numbers at the beginning of each generate_x() or rand() function (i.e. not inside of if branches), or try using MemorizingSource(..., min_reserve=$(r.finish+n-r.start+1)) (or larger) to reserve space for memory.
-              """)
+        s.memory[s.furthest+1:s.furthest+len] = s.memory[r.start:r.finish]
+        r.idx = r.idx - r.start + s.furthest + 1
+        r.start = s.furthest + 1
+        r.finish = s.furthest + len
+        s.furthest += len
+        s.move_count += 1
     end
+
+    @assert r.finish == s.furthest
+    orig = length(s.memory)
+    if orig < s.furthest + n
+        @assert n <= MTCacheLength
+        resize!(s.memory, orig+MTCacheLength)
+        Base.Random.gen_rand(s.rng) # could be faster to use dsfmt_fill_array_close1_open2
+        s.memory[orig+1:end] = s.rng.vals
+        Base.Random.mt_setempty!(s.rng)
+    end
+    s.furthest += n
+    r.finish += n
     return nothing
+end
+
+function check_consistency(s::MemorizingSource)
+    if s.move_count > 0.01*length(s.rngs) && s.move_warning
+        warn("""
+             DESPOT's MemorizingSource random number generator had to move the memory locations of the rngs $(s.move_count) times. If this number was large, it may be affecting performance (profiling is the best way to tell).
+
+             To suppress this warning, use MemorizingSource(..., move_warning=false).
+
+             To reduce the number of moves, try using MemorizingSource(..., min_reserve=n) and increase n until the number of moves is low.
+             """)
+    end
 end

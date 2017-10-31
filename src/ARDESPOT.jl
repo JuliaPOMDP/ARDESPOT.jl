@@ -51,7 +51,7 @@ include("random_2.jl")
     bounds::Any                             = IndependentBounds(-1e6, 1e6)
     default_action::Any                     = ExceptionRethrow()
     rng::AbstractRNG                        = Base.GLOBAL_RNG
-    random_source::DESPOTRandomSource       = FastMersenneSource(K, 50)
+    random_source::DESPOTRandomSource       = MemorizingSource(K, D, rng)
     bounds_warnings::Bool                   = true
 end
 
