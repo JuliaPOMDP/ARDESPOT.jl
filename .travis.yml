@@ -5,9 +5,8 @@ os:
   - osx
 julia:
   - 0.6
-  - nightly
 notifications:
-  email: false
+  email: sunbergzach@gmail.com
 git:
   depth: 99999999
 
