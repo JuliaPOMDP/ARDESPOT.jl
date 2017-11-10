@@ -1,4 +1,4 @@
-function D3Trees.D3Tree(D::DESPOT; title="DESPOT Tree")
+function D3Trees.D3Tree(D::DESPOT; title="DESPOT Tree", kwargs...)
     lenb = length(D.children)
     lenba = length(D.ba_children)
     len = lenb + lenba
@@ -49,11 +49,12 @@ function D3Trees.D3Tree(D::DESPOT; title="DESPOT Tree")
                       $(length(D.ba_children[ba])) children
                       """
     end
-    return D3Tree(children,
+    return D3Tree(children;
                   text=text,
                   tooltip=tt,
                   link_style=link_style,
-                  title=title
+                  title=title,
+                  kwargs...
                  )
 end
 

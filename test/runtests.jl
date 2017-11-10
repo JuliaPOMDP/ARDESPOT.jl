@@ -95,3 +95,18 @@ include("random_2.jl")
 # visualization
 stringmime(MIME("text/html"), D)
 show(STDOUT, MIME("text/plain"), D)
+
+# from README:
+using POMDPs, POMDPModels, POMDPToolbox, BasicPOMCP
+
+pomdp = TigerPOMDP()
+
+solver = POMCPSolver()
+planner = solve(solver, pomdp)
+
+for (s, a, o) in stepthrough(pomdp, planner, "sao", max_steps=10)
+    println("State was $s,")
+    println("action $a was taken,")
+    println("and observation $o was received.\n")
+end
+
