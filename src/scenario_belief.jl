@@ -8,6 +8,8 @@ end
 
 rand(rng::AbstractRNG, b::ScenarioBelief) = b.scenarios[rand(rng, 1:length(b.scenarios))]
 ParticleFilters.particles(b::ScenarioBelief) = (last(p) for p in b.scenarios)
+ParticleFilters.n_particles(b::ScenarioBelief) = length(b.scenarios)
+ParticleFilters.weight(b::ScenarioBelief, s) = 1/length(b.scenarios)
 previous_obs(b::ScenarioBelief) = b._obs
 
 initialize_belief(::PreviousObservationUpdater{T}, b::ScenarioBelief{S, Union{}}) where {S,T} = Nullable{T}()
