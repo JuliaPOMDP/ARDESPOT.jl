@@ -42,7 +42,7 @@ struct FullyObservableValueUB{P<:Union{Solver, Policy}}
     p::P
 end
 
-ubound(ub::FullyObservableValueUB, pomdp::POMDP, b::ScenarioBelief) = mean(value(p, s) for s in particles(b)) # assumes that all are weighted equally
+ubound(ub::FullyObservableValueUB, pomdp::POMDP, b::ScenarioBelief) = mean(value(ub.p, s) for s in particles(b)) # assumes that all are weighted equally
 
 function init_bound(ub::FullyObservableValueUB{S}, pomdp::POMDP, sol::DESPOTSolver) where S <: Solver
     return FullyObservableValueUB(solve(ub.p, pomdp))
