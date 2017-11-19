@@ -26,7 +26,7 @@ function action(p::DESPOTPlanner, b)
 
         return rand(p.rng, best_as)::action_type(p.pomdp) # best_as will usually only have one entry, but we want to break the tie randomly
     catch ex
-        return default_action(p.sol.default_action, b, ex)::action_type(p.pomdp)
+        return default_action(p.sol.default_action, p.pomdp, b, ex)::action_type(p.pomdp)
     end
 end
 

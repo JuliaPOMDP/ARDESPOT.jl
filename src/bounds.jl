@@ -8,7 +8,7 @@ function bounds_sanity_check(pomdp::POMDP, sb::ScenarioBelief, L_0, U_0)
     end
     if all(isterminal(pomdp, s) for s in particles(sb))
         if L_0 != 0.0 || U_0 != 0.0
-            error(@sprintf("If all states are terminal, lower and upper bounds should be zero (L_0=%8.2g, U_0=%8.2g).", L_0, U_0))
+            error(@sprintf("If all states are terminal, lower and upper bounds should be zero (L_0=%-10.2g, U_0=%-10.2g). (try IndependentBounds(l, u, check_terminal=true))", L_0, U_0))
         end
     end
 end
@@ -19,12 +19,23 @@ end
 struct IndependentBounds{L, U}
     lower::L
     upper::U
+    check_terminal::Bool
 end
 
-bounds(bounds::IndependentBounds, pomdp::POMDP, b::ScenarioBelief) = (lbound(bounds.lower, pomdp, b), ubound(bounds.upper, pomdp, b))
+IndependentBounds(l, u; check_terminal=false) = IndependentBounds(l, u, check_terminal)
+
+function bounds(bounds::IndependentBounds, pomdp::POMDP, b::ScenarioBelief)
+    if bounds.check_terminal && all(isterminal(pomdp, s) for s in particles(b))
+        return (0.0, 0.0)
+    end
+    return (lbound(bounds.lower, pomdp, b), ubound(bounds.upper, pomdp, b))
+end
+
 function init_bounds(bounds::IndependentBounds, pomdp::POMDP, sol::DESPOTSolver) 
     return IndependentBounds(init_bound(bounds.lower, pomdp, sol),
-                             init_bound(bounds.upper, pomdp, sol))
+                             init_bound(bounds.upper, pomdp, sol),
+                             bounds.check_terminal
+                            )
 end
 init_bound(bound, pomdp, sol) = bound
 
