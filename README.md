@@ -73,7 +73,7 @@ To access the state particles in a `ScenairoBelief` `b`, use `particles(b)` (or 
 
 A common lower bound strategy is to use a rollout policy. This is provided by the `DefaultPolicyLB` type, for example
 ```julia
-DESPOTSolver(bounds=(DefaultPolicyLB(RandomSolver(), 0.0)))
+DESPOTSolver(bounds=(DefaultPolicyLB(RandomSolver()), 0.0))
 ```
 will use a random rollout policy to calculate a lower bound.
 
