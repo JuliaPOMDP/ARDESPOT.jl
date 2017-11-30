@@ -15,6 +15,8 @@ struct DESPOT{S,A,O}
     ba_rho::Vector{Float64} # needed for backup
     ba_Rsum::Vector{Float64} # needed for backup
     ba_action::Vector{A}
+
+    _discount::Float64 # for inferring L in visualization
 end
 
 function DESPOT(p::DESPOTPlanner, b_0)
@@ -45,7 +47,8 @@ function DESPOT(p::DESPOTPlanner, b_0)
                          Float64[],
                          Float64[],
                          Float64[],
-                         A[]
+                         A[],
+                         discount(p.pomdp)
                  )
 end
 
