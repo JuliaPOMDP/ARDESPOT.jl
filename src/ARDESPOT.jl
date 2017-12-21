@@ -33,7 +33,9 @@ export
     FullyObservableValueUB,
     DefaultPolicyLB,
     bounds,
-    init_bounds
+    init_bounds,
+
+    ReportWhenUsed
 
 
 include("random.jl")
@@ -79,7 +81,6 @@ include("tree.jl")
 include("planner.jl")
 include("pomdps_glue.jl")
 
-# include("tree_printing.jl")
 include("visualization.jl")
 include("exceptions.jl")
 
