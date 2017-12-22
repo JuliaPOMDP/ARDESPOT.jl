@@ -30,6 +30,8 @@ function rand(r::MemorizingRNG, ::Type{I}) where I <: FloatInterval
     rand_inbounds(r, I)
 end
 
+rand(r::MemorizingRNG, ::Type{Float64}) = rand(r, CloseOpen)
+
 function gen_rand!(r::MemorizingRNG{MersenneTwister}, n::Integer)
     len = length(r.memory)
     if len < r.idx + n

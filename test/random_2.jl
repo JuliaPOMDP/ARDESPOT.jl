@@ -5,6 +5,8 @@ rand(rng)
 rand(rng)
 rand(rng)
 
+rand(rng, Float64)
+
 rng.idx=0
 @test rand(rng) == a
 
