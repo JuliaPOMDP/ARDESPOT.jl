@@ -77,7 +77,7 @@ DESPOTSolver(bounds=(DefaultPolicyLB(RandomSolver()), 0.0))
 ```
 will use a random rollout policy to calculate a lower bound.
 
-Bounds need not be calculated independently; a single object or function that returns a tuple can be passed to the `bounds` argument. More examples can be found in [src/bounds.jl](). File an issue if more documentation is needed.
+Bounds need not be calculated independently; a single object or function that returns a tuple can be passed to the `bounds` argument. More examples can be found in [src/bounds.jl](). Please file an issue if more documentation is needed.
 
 ## Visualization
 

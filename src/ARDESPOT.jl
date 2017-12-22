@@ -17,9 +17,6 @@ export
     DESPOTPlanner,
 
     DESPOTRandomSource,
-    MersenneSource,
-    FastMersenneSource,
-    SimpleMersenneSource,
     MemorizingSource,
     MemorizingRNG,
 
@@ -38,7 +35,7 @@ export
     ReportWhenUsed
 
 
-include("random.jl")
+# include("random.jl")
 include("random_2.jl")
 
 

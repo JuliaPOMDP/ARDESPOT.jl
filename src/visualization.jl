@@ -48,7 +48,7 @@ function D3Trees.D3Tree(D::DESPOT; title="DESPOT Tree", kwargs...)
             text[ba+lenb] = @sprintf("""
                                      a:%s (ρ:%6.2f)
                                      L:%6.2f, U:%6.2f,
-                                     l:%6.2f μ:%6.2f""",
+                                     l:%6.2f, μ:%6.2f""",
                                      D.ba_action[ba], D.ba_rho[ba],
                                      L[ba+lenb], U,
                                      ba_l(D, ba), D.ba_mu[ba])

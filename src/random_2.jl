@@ -1,3 +1,7 @@
+abstract type DESPOTRandomSource end
+
+check_consistency(rs::DESPOTRandomSource) = nothing
+
 include("memorizing_rng.jl")
 
 import Base.Random.MTCacheLength
@@ -8,15 +12,16 @@ mutable struct MemorizingSource{RNG<:AbstractRNG} <: DESPOTRandomSource
     rngs::Matrix{MemorizingRNG{MemorizingSource{RNG}}}
     furthest::Int
     min_reserve::Int
+    grow_reserve::Bool
     move_count::Int
     move_warning::Bool
 end
 
-function MemorizingSource(K::Int, depth::Int, rng::AbstractRNG; min_reserve=0, move_warning=true)
+function MemorizingSource(K::Int, depth::Int, rng::AbstractRNG=Base.GLOBAL_RNG; min_reserve=0, grow_reserve=true, move_warning=true)
     RNG = typeof(rng)
     memory = Float64[]
     rngs = Matrix{MemorizingRNG{MemorizingSource{RNG}}}(depth+1, K)
-    src = MemorizingSource{RNG}(rng, memory, rngs, 0, min_reserve, 0, move_warning)
+    src = MemorizingSource{RNG}(rng, memory, rngs, 0, min_reserve, grow_reserve, 0, move_warning)
     for i in 1:K
         for j in 1:depth+1
             rngs[j, i] = MemorizingRNG(src.memory, 1, 0, 0, src)
@@ -52,6 +57,8 @@ end
 
 function gen_rand!(r::MemorizingRNG{MemorizingSource{MersenneTwister}}, n::Integer)
     s = r.source
+
+    # make sure that we're on the very end of the source's memory
     if r.finish != s.furthest # we need to move the memory to the end
         len = r.finish - r.start + 1
         if length(s.memory) < s.furthest + len
@@ -63,6 +70,9 @@ function gen_rand!(r::MemorizingRNG{MemorizingSource{MersenneTwister}}, n::Integ
         r.finish = s.furthest + len
         s.furthest += len
         s.move_count += 1
+        if s.grow_reserve
+            s.min_reserve = len + n
+        end
     end
 
     @assert r.finish == s.furthest

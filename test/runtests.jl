@@ -7,18 +7,9 @@ using POMDPToolbox
 
 pomdp = BabyPOMDP()
 
-# FastMersenneSource
-rs = FastMersenneSource(10, 50)
-srand(rs, 7)
-mt = ARDESPOT.get_rng(rs, 3, 8)
-r1 = rand(mt)
-mt = ARDESPOT.get_rng(rs, 3, 8)
-r2 = rand(mt)
-@test r1 == r2
-
 K = 10
 rng = MersenneTwister(14)
-rs = FastMersenneSource(K, 50)
+rs = MemorizingSource(K, 50)
 srand(rs, 10)
 b_0 = initial_state_distribution(pomdp)
 scenarios = [i=>rand(rng, b_0) for i in 1:K]
@@ -51,8 +42,7 @@ hr = HistoryRecorder(max_steps=2)
 
 # RewindingMersenneSource
 bounds = IndependentBounds(DefaultPolicyLB(FeedWhenCrying()), 0.0)
-solver = DESPOTSolver(bounds=bounds,
-                      random_source=FastMersenneSource(500, 50))
+solver = DESPOTSolver(bounds=bounds)
 planner = solve(solver, pomdp)
 hr = HistoryRecorder(max_steps=2)
 @time hist = simulate(hr, pomdp, planner)
