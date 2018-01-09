@@ -31,6 +31,9 @@ export
     DefaultPolicyLB,
     bounds,
     init_bounds,
+    lbound,
+    ubound,
+    init_bound,
 
     ReportWhenUsed
 

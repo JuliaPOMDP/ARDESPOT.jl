@@ -1,4 +1,5 @@
 init_bounds(bounds, pomdp, sol) = bounds
+init_bounds(t::Tuple, pomdp, sol) = (init_bound(first(t), pomdp, sol), init_bound(last(t), pomdp, sol))
 bounds(f::Function, pomdp::POMDP, b::ScenarioBelief) = f(pomdp, b)
 bounds(t::Tuple, pomdp::POMDP, b::ScenarioBelief) = (lbound(t[1], pomdp, b), ubound(t[2], pomdp, b))
 
