@@ -71,7 +71,7 @@ function gen_rand!(r::MemorizingRNG{MemorizingSource{MersenneTwister}}, n::Integ
         s.furthest += len
         s.move_count += 1
         if s.grow_reserve
-            s.min_reserve = len + n
+            s.min_reserve = max(s.min_reserve, len + n)
         end
     end
 
@@ -96,7 +96,7 @@ function check_consistency(s::MemorizingSource)
 
              To suppress this warning, use MemorizingSource(..., move_warning=false).
 
-             To reduce the number of moves, try using MemorizingSource(..., min_reserve=n) and increase n until the number of moves is low.
+             To reduce the number of moves, try using MemorizingSource(..., min_reserve=n) and increase n until the number of moves is low (the final min_reserve was $(s.min_reserve)).
              """)
     end
 end
