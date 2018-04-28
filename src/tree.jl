@@ -58,7 +58,8 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
     O = obs_type(p.pomdp)
     odict = Dict{O, Int}()
 
-    for a in iterator(actions(p.pomdp))
+    belief = get_belief(D, b, p.rs)
+    for a in iterator(actions(p.pomdp, belief))
         empty!(odict)
         rsum = 0.0
 
