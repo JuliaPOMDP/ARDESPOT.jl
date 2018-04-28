@@ -116,7 +116,13 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
     end
 end
 
-get_belief(D::DESPOT, b::Int, rs::DESPOTRandomSource) = ScenarioBelief(D.scenarios[b], rs, D.Delta[b], Nullable(D.obs[b]))
+function get_belief(D::DESPOT, b::Int, rs::DESPOTRandomSource)
+    if isassigned(D.obs, b)
+        ScenarioBelief(D.scenarios[b], rs, D.Delta[b], Nullable(D.obs[b]))
+    else
+        ScenarioBelief(D.scenarios[b], rs, D.Delta[b], Nullable{eltype(D.obs)}())
+    end
+end
 
 function Base.resize!(D::DESPOT, n::Int)
     resize!(D.children, n)
