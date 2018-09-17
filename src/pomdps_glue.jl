@@ -2,7 +2,7 @@ solve(sol::DESPOTSolver, p::POMDP) = DESPOTPlanner(sol, p)
 
 function action(p::DESPOTPlanner, b)
     try
-        srand(p.rs, rand(p.rng, UInt32))
+        seed!(p.rs, rand(p.rng, UInt32))
 
         D = build_despot(p, b)
 
@@ -34,7 +34,7 @@ ba_l(D::DESPOT, ba::Int) = D.ba_rho[ba] + sum(D.l[bnode] for bnode in D.ba_child
 
 updater(p::DESPOTPlanner) = SIRParticleFilter(p.pomdp, p.sol.K, rng=p.rng)
 
-function Base.srand(p::DESPOTPlanner, seed) 
-    srand(p.rng, seed)
+function Random.seed!(p::DESPOTPlanner, seed) 
+    seed!(p.rng, seed)
     return p
 end

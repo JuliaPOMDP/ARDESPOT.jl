@@ -57,7 +57,7 @@ function rollout(pomdp::POMDP, policy::Policy, b0::ScenarioBelief, steps::Intege
 
         s = sp
         scenario_mem[1] = k=>s
-        b = ScenarioBelief(scenario_mem, b.random_source, b.depth+1, Nullable(o))
+        b = ScenarioBelief(scenario_mem, b.random_source, b.depth+1, o)
 
         disc *= discount(pomdp)
         steps -= 1

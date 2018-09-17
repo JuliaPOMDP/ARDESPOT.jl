@@ -1,13 +1,13 @@
-__precompile__()
 module ARDESPOT
 
+using POMDPs
+using BeliefUpdaters
 using Parameters
 using CPUTime
 using ParticleFilters
-using POMDPToolbox
 using D3Trees
-
-importall POMDPs
+using Random
+using Printf
 
 using BasicPOMCP # for ExceptionRethrow and NoDecision
 import BasicPOMCP.default_action
@@ -52,7 +52,7 @@ include("random_2.jl")
     max_trials::Int                         = typemax(Int)
     bounds::Any                             = IndependentBounds(-1e6, 1e6)
     default_action::Any                     = ExceptionRethrow()
-    rng::AbstractRNG                        = Base.GLOBAL_RNG
+    rng::AbstractRNG                        = Random.GLOBAL_RNG
     random_source::DESPOTRandomSource       = MemorizingSource(K, D, rng)
     bounds_warnings::Bool                   = true
 end

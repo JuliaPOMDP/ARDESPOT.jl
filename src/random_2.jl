@@ -4,7 +4,7 @@ check_consistency(rs::DESPOTRandomSource) = nothing
 
 include("memorizing_rng.jl")
 
-import Base.Random.MTCacheLength
+import Random.MT_CACHE_F
 
 mutable struct MemorizingSource{RNG<:AbstractRNG} <: DESPOTRandomSource
     rng::RNG
@@ -78,8 +78,8 @@ function gen_rand!(r::MemorizingRNG{MemorizingSource{MersenneTwister}}, n::Integ
     @assert r.finish == s.furthest
     orig = length(s.memory)
     if orig < s.furthest + n
-        @assert n <= MTCacheLength
-        resize!(s.memory, orig+MTCacheLength)
+        @assert n <= MT_CACHE_F
+        resize!(s.memory, orig+MT_CACHE_F)
         Base.Random.gen_rand(s.rng) # could be faster to use dsfmt_fill_array_close1_open2
         s.memory[orig+1:end] = s.rng.vals
         Base.Random.mt_setempty!(s.rng)

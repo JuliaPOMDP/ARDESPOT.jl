@@ -25,7 +25,7 @@ function DESPOT(p::DESPOTPlanner, b_0)
     O = obs_type(p.pomdp)
     root_scenarios = [i=>rand(p.rng, b_0) for i in 1:p.sol.K]
     
-    scenario_belief = ScenarioBelief(root_scenarios, p.rs, 0, Nullable{O}())
+    scenario_belief = ScenarioBelief(root_scenarios, p.rs, 0, missing)
     L_0, U_0 = bounds(p.bounds, p.pomdp, scenario_belief)
 
     if p.sol.bounds_warnings
@@ -118,9 +118,9 @@ end
 
 function get_belief(D::DESPOT, b::Int, rs::DESPOTRandomSource)
     if isassigned(D.obs, b)
-        ScenarioBelief(D.scenarios[b], rs, D.Delta[b], Nullable(D.obs[b]))
+        ScenarioBelief(D.scenarios[b], rs, D.Delta[b], D.obs[b])
     else
-        ScenarioBelief(D.scenarios[b], rs, D.Delta[b], Nullable{eltype(D.obs)}())
+        ScenarioBelief(D.scenarios[b], rs, D.Delta[b], missing)
     end
 end
 
