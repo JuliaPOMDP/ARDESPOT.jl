@@ -1,6 +1,7 @@
 name = "ARDESPOT"
 uuid = "d96c9ae4-3372-47d5-8a88-316ae77be8cf"
 repo = "https://github.com/JuliaPOMDP/ARDESPOT.jl"
+version = "0.2.0"
 
 [deps]
 BasicPOMCP = "d721219e-3fc6-5570-a8ef-e5402f47c49e"
