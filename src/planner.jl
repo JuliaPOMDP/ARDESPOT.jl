@@ -117,10 +117,32 @@ function backup!(D::DESPOT, b::Int, p::DESPOTPlanner)
 end
 
 function next_best(D::DESPOT, b::Int, p::DESPOTPlanner)
-    ai = indmax(D.ba_mu[ba] for ba in D.children[b])
-    ba = D.children[b][ai]
-    zi = indmax(excess_uncertainty(D, bp, p) for bp in D.ba_children[ba])
-    return D.ba_children[ba][zi]
+    max_mu = -Inf
+    best_ba = first(D.children[b])
+    for ba in D.children[b]
+        mu = D.ba_mu[ba]
+        if mu > max_mu
+            max_mu = mu
+            best_ba = ba
+        end
+    end
+
+    max_eu = -Inf
+    best_bp = first(D.ba_children[best_ba])
+    for bp in D.ba_children[best_ba]
+        eu = excess_uncertainty(D, bp, p)
+        if eu > max_eu
+            max_eu = eu
+            best_bp = bp
+        end
+    end
+
+    return best_bp
+
+    # ai = indmax(D.ba_mu[ba] for ba in D.children[b])
+    # ba = D.children[b][ai]
+    # zi = indmax(excess_uncertainty(D, bp, p) for bp in D.ba_children[ba])
+    # return D.ba_children[ba][zi]
 end
 
 function excess_uncertainty(D::DESPOT, b::Int, p::DESPOTPlanner)

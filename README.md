@@ -14,16 +14,19 @@ If you are trying to use this package and require more documentation, please fil
 
 ## Installation
 
+On Julia v0.7 or later, ARDESPOT is in the JuliaPOMDP registry
+
 ```julia
 Pkg.add("POMDPs")
-import POMDPs
-POMDPs.add("ARDESPOT")
+using POMDPs
+POMDPs.add_registry()
+Pkg.add("ARDESPOT")
 ```
 
 ## Usage
 
 ```julia
-using POMDPs, POMDPModels, POMDPToolbox, ARDESPOT
+using POMDPs, POMDPModels, POMDPSimulators, ARDESPOT
 
 pomdp = TigerPOMDP()
 
@@ -90,7 +93,7 @@ pomdp = TigerPOMDP()
 
 solver = DESPOTSolver(bounds=(-20.0, 0.0))
 planner = solve(solver, pomdp)
-b0 = initial_state_distribution(pomdp)
+b0 = initialstate_distribution(pomdp)
 
 tree = ARDESPOT.build_despot(planner, b0)
 inchrome(D3Tree(tree, init_expand=5))

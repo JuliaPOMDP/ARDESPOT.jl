@@ -3,29 +3,20 @@ language: julia
 os:
   - linux
 julia:
-  - 0.6
+  - 0.7
+  - 1.0
 notifications:
   email: sunbergzach@gmail.com
 git:
   depth: 99999999
 
-## uncomment the following lines to allow failures on nightly julia
-## (tests will run but not make your overall status red)
-#matrix:
-#  allow_failures:
-#  - julia: nightly
+script:
+  - git clone https://github.com/JuliaRegistries/General  $(julia -e 'import Pkg; println(joinpath(Pkg.depots1(), "registries", "General"))')
+  - git clone https://github.com/JuliaPOMDP/Registry  $(julia -e 'import Pkg; println(joinpath(Pkg.depots1(), "registries", "JuliaPOMDP"))')
+    # - julia -e 'import Pkg; Pkg.add("POMDPs"); import POMDPs; POMDPs.add_registry()'
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - julia --project --color=yes --check-bounds=yes -e 'import Pkg; Pkg.build(); Pkg.test("ARDESPOT"; coverage=true)'
 
-## uncomment and modify the following lines to manually install system packages
-#addons:
-#  apt: # apt-get for linux
-#    packages:
-#    - gfortran
-#before_script: # homebrew for mac
-#  - if [ $TRAVIS_OS_NAME = osx ]; then brew install gcc; fi
-
-## uncomment the following lines to override the default test script
-#script:
-#  - julia -e 'Pkg.clone(pwd()); Pkg.build("ARDESPOT"); Pkg.test("ARDESPOT"; coverage=true)'
 after_success:
   # push coverage results to Coveralls
   - julia -e 'cd(Pkg.dir("ARDESPOT")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'

@@ -65,17 +65,17 @@ end
 
 # Default Policy Lower Bound
 
-struct DefaultPolicyLB{P<:Union{Solver, Policy}}
+struct DefaultPolicyLB{P<:Union{Solver, Policy}, D<:Union{Nothing,Int}}
     policy::P
-    max_depth::Nullable{Int}
+    max_depth::D
 end
 
 function DefaultPolicyLB(policy_or_solver::T; max_depth=nothing) where T <: Union{Solver, Policy}
-    return DefaultPolicyLB(policy_or_solver, Nullable{Int}(max_depth))
+    return DefaultPolicyLB(policy_or_solver, max_depth)
 end
 
 function lbound(lb::DefaultPolicyLB, pomdp::POMDP, b::ScenarioBelief)
-    rsum = branching_sim(pomdp, lb.policy, b, get(lb.max_depth)-b.depth)
+    rsum = branching_sim(pomdp, lb.policy, b, lb.max_depth-b.depth)
     return rsum/length(b.scenarios)
 end
 
@@ -85,6 +85,6 @@ function init_bound(lb::DefaultPolicyLB{S}, pomdp::POMDP, sol::DESPOTSolver) whe
 end
 
 function init_bound(lb::DefaultPolicyLB{P}, pomdp::POMDP, sol::DESPOTSolver) where P <: Policy
-    max_depth = get(lb.max_depth, sol.D)
-    return DefaultPolicyLB(lb.policy, Nullable(max_depth))
+    max_depth = something(lb.max_depth, sol.D)
+    return DefaultPolicyLB(lb.policy, max_depth)
 end

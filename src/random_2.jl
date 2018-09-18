@@ -4,7 +4,7 @@ check_consistency(rs::DESPOTRandomSource) = nothing
 
 include("memorizing_rng.jl")
 
-import Base.Random.MTCacheLength
+import Random.MT_CACHE_F
 
 mutable struct MemorizingSource{RNG<:AbstractRNG} <: DESPOTRandomSource
     rng::RNG
@@ -17,10 +17,10 @@ mutable struct MemorizingSource{RNG<:AbstractRNG} <: DESPOTRandomSource
     move_warning::Bool
 end
 
-function MemorizingSource(K::Int, depth::Int, rng::AbstractRNG=Base.GLOBAL_RNG; min_reserve=0, grow_reserve=true, move_warning=true)
+function MemorizingSource(K::Int, depth::Int, rng::AbstractRNG=Random.GLOBAL_RNG; min_reserve=0, grow_reserve=true, move_warning=true)
     RNG = typeof(rng)
     memory = Float64[]
-    rngs = Matrix{MemorizingRNG{MemorizingSource{RNG}}}(depth+1, K)
+    rngs = Matrix{MemorizingRNG{MemorizingSource{RNG}}}(undef, depth+1, K)
     src = MemorizingSource{RNG}(rng, memory, rngs, 0, min_reserve, grow_reserve, 0, move_warning)
     for i in 1:K
         for j in 1:depth+1
@@ -42,8 +42,8 @@ function get_rng(s::MemorizingSource, scenario::Int, depth::Int)
     return rng
 end
 
-function srand(s::MemorizingSource, seed)
-    srand(s.rng, seed)
+function Random.seed!(s::MemorizingSource, seed)
+    Random.seed!(s.rng, seed)
     resize!(s.memory, 0)
     for i in 1:size(s.rngs, 2)
         for j in 1:size(s.rngs, 1)
@@ -78,20 +78,22 @@ function gen_rand!(r::MemorizingRNG{MemorizingSource{MersenneTwister}}, n::Integ
     @assert r.finish == s.furthest
     orig = length(s.memory)
     if orig < s.furthest + n
-        @assert n <= MTCacheLength
-        resize!(s.memory, orig+MTCacheLength)
-        Base.Random.gen_rand(s.rng) # could be faster to use dsfmt_fill_array_close1_open2
+        @assert n <= MT_CACHE_F
+        resize!(s.memory, orig+MT_CACHE_F)
+        Random.gen_rand(s.rng) # could be faster to use dsfmt_fill_array_close1_open2
         s.memory[orig+1:end] = s.rng.vals
-        Base.Random.mt_setempty!(s.rng)
+        Random.mt_setempty!(s.rng)
     end
     s.furthest += n
     r.finish += n
     return nothing
 end
 
+Random.rng_native_52(s::MemorizingSource) = Random.rng_native_52(s.rng)
+
 function check_consistency(s::MemorizingSource)
     if s.move_count > 0.01*length(s.rngs) && s.move_warning
-        warn("""
+        @warn("""
              DESPOT's MemorizingSource random number generator had to move the memory locations of the rngs $(s.move_count) times. If this number was large, it may be affecting performance (profiling is the best way to tell).
 
              To suppress this warning, use MemorizingSource(..., move_warning=false).
