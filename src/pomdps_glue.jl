@@ -1,8 +1,8 @@
-solve(sol::DESPOTSolver, p::POMDP) = DESPOTPlanner(sol, p)
+POMDPs.solve(sol::DESPOTSolver, p::POMDP) = DESPOTPlanner(sol, p)
 
-function action(p::DESPOTPlanner, b)
+function POMDPs.action(p::DESPOTPlanner, b)
     try
-        seed!(p.rs, rand(p.rng, UInt32))
+        Random.seed!(p.rs, rand(p.rng, UInt32))
 
         D = build_despot(p, b)
 
@@ -13,7 +13,7 @@ function action(p::DESPOTPlanner, b)
         end
 
         best_l = -Inf
-        best_as = action_type(p.pomdp)[]
+        best_as = actiontype(p.pomdp)[]
         for ba in D.children[1]
             l = ba_l(D, ba)
             if l > best_l
@@ -24,17 +24,17 @@ function action(p::DESPOTPlanner, b)
             end
         end
 
-        return rand(p.rng, best_as)::action_type(p.pomdp) # best_as will usually only have one entry, but we want to break the tie randomly
+        return rand(p.rng, best_as)::actiontype(p.pomdp) # best_as will usually only have one entry, but we want to break the tie randomly
     catch ex
-        return default_action(p.sol.default_action, p.pomdp, b, ex)::action_type(p.pomdp)
+        return default_action(p.sol.default_action, p.pomdp, b, ex)::actiontype(p.pomdp)
     end
 end
 
 ba_l(D::DESPOT, ba::Int) = D.ba_rho[ba] + sum(D.l[bnode] for bnode in D.ba_children[ba])
 
-updater(p::DESPOTPlanner) = SIRParticleFilter(p.pomdp, p.sol.K, rng=p.rng)
+POMDPs.updater(p::DESPOTPlanner) = SIRParticleFilter(p.pomdp, p.sol.K, rng=p.rng)
 
 function Random.seed!(p::DESPOTPlanner, seed) 
-    seed!(p.rng, seed)
+    Random.seed!(p.rng, seed)
     return p
 end

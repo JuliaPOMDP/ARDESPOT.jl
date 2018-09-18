@@ -20,12 +20,12 @@ struct DESPOT{S,A,O}
 end
 
 function DESPOT(p::DESPOTPlanner, b_0)
-    S = state_type(p.pomdp)
-    A = action_type(p.pomdp)
-    O = obs_type(p.pomdp)
+    S = statetype(p.pomdp)
+    A = actiontype(p.pomdp)
+    O = obstype(p.pomdp)
     root_scenarios = [i=>rand(p.rng, b_0) for i in 1:p.sol.K]
     
-    scenario_belief = ScenarioBelief(root_scenarios, p.rs, 0, missing)
+    scenario_belief = ScenarioBelief(root_scenarios, p.rs, 0, b_0)
     L_0, U_0 = bounds(p.bounds, p.pomdp, scenario_belief)
 
     if p.sol.bounds_warnings
@@ -41,7 +41,7 @@ function DESPOT(p::DESPOTPlanner, b_0)
                          [L_0],
                          [U_0],
                          [L_0],
-                         Vector{O}(1),
+                         Vector{O}(undef, 1),
                  
                          Vector{Int}[],
                          Float64[],
@@ -53,13 +53,13 @@ function DESPOT(p::DESPOTPlanner, b_0)
 end
 
 function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
-    S = state_type(p.pomdp)
-    A = action_type(p.pomdp)
-    O = obs_type(p.pomdp)
+    S = statetype(p.pomdp)
+    A = actiontype(p.pomdp)
+    O = obstype(p.pomdp)
     odict = Dict{O, Int}()
 
     belief = get_belief(D, b, p.rs)
-    for a in iterator(actions(p.pomdp, belief))
+    for a in actions(p.pomdp, belief)
         empty!(odict)
         rsum = 0.0
 

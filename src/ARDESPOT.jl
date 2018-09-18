@@ -12,6 +12,8 @@ using Printf
 using BasicPOMCP # for ExceptionRethrow and NoDecision
 import BasicPOMCP.default_action
 
+import Random.rand
+
 export
     DESPOTSolver,
     DESPOTPlanner,
@@ -73,7 +75,7 @@ function DESPOTPlanner(sol::DESPOTSolver, pomdp::POMDP)
     bounds = init_bounds(sol.bounds, pomdp, sol)
     rng = deepcopy(sol.rng)
     rs = deepcopy(sol.random_source)
-    srand(rs, rand(rng, UInt32))
+    Random.seed!(rs, rand(rng, UInt32))
     return DESPOTPlanner(deepcopy(sol), pomdp, bounds, rs, rng)
 end
 

@@ -9,6 +9,7 @@ rand(rng::AbstractRNG, b::ScenarioBelief) = b.scenarios[rand(rng, 1:length(b.sce
 ParticleFilters.particles(b::ScenarioBelief) = (last(p) for p in b.scenarios)
 ParticleFilters.n_particles(b::ScenarioBelief) = length(b.scenarios)
 ParticleFilters.weight(b::ScenarioBelief, s) = 1/length(b.scenarios)
+POMDPs.pdf(b::ScenarioBelief{S}, s::S) where S = sum(p==s for p in particles(b))/length(b.scenarios) # this is slow
 previous_obs(b::ScenarioBelief) = b._obs
 
 initialize_belief(::PreviousObservationUpdater, b::ScenarioBelief) = previous_obs(b)
