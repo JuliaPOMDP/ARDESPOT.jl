@@ -57,6 +57,7 @@ include("random_2.jl")
     rng::AbstractRNG                        = Random.GLOBAL_RNG
     random_source::DESPOTRandomSource       = MemorizingSource(K, D, rng)
     bounds_warnings::Bool                   = true
+    tree_in_info::Bool                      = false
 end
 
 include("scenario_belief.jl")

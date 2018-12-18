@@ -1,10 +1,15 @@
 POMDPs.solve(sol::DESPOTSolver, p::POMDP) = DESPOTPlanner(sol, p)
 
-function POMDPs.action(p::DESPOTPlanner, b)
+function POMDPs.action_info(p::DESPOTPlanner, b)
+    info = Dict{Symbol, Any}()
     try
         Random.seed!(p.rs, rand(p.rng, UInt32))
 
         D = build_despot(p, b)
+        
+        if p.sol.tree_in_info
+            info[:tree] = D
+        end
 
         check_consistency(p.rs)
 
@@ -24,11 +29,13 @@ function POMDPs.action(p::DESPOTPlanner, b)
             end
         end
 
-        return rand(p.rng, best_as)::actiontype(p.pomdp) # best_as will usually only have one entry, but we want to break the tie randomly
+        return rand(p.rng, best_as)::actiontype(p.pomdp), info # best_as will usually only have one entry, but we want to break the tie randomly
     catch ex
-        return default_action(p.sol.default_action, p.pomdp, b, ex)::actiontype(p.pomdp)
+        return default_action(p.sol.default_action, p.pomdp, b, ex)::actiontype(p.pomdp), info
     end
 end
+
+POMDPs.action(p::DESPOTPlanner, b) = first(action_info(p, b))::actiontype(p.pomdp)
 
 ba_l(D::DESPOT, ba::Int) = D.ba_rho[ba] + sum(D.l[bnode] for bnode in D.ba_children[ba])
 
