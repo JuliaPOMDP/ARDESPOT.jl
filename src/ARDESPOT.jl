@@ -8,6 +8,7 @@ using ParticleFilters
 using D3Trees
 using Random
 using Printf
+using POMDPModelTools
 
 using BasicPOMCP # for ExceptionRethrow and NoDecision
 import BasicPOMCP.default_action

@@ -5,6 +5,7 @@ using POMDPs
 using POMDPModels
 using POMDPSimulators
 using Random
+using POMDPModelTools
 
 include("memorizing_rng.jl")
 
@@ -71,7 +72,8 @@ rng = MersenneTwister(4)
 solver = DESPOTSolver(epsilon_0=0.1,
                       bounds=bounds,
                       rng=rng,
-                      random_source=MemorizingSource(500, 90, rng)
+                      random_source=MemorizingSource(500, 90, rng),
+                      tree_in_info=true
                      )
 p = solve(solver, pomdp)
 a = action(p, initialstate_distribution(pomdp))
@@ -80,6 +82,8 @@ include("random_2.jl")
 
 # visualization
 show(stdout, MIME("text/plain"), D)
+a, info = action_info(p, initialstate_distribution(pomdp))
+show(stdout, MIME("text/plain"), info[:tree])
 
 # from README:
 using POMDPs, POMDPModels, POMDPSimulators, ARDESPOT

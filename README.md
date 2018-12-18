@@ -87,16 +87,16 @@ Bounds need not be calculated independently; a single object or function that re
 [D3Trees.jl](https://github.com/sisl/D3Trees.jl) can be used to visualize the search tree, for example
 
 ```julia
-using POMDPs, POMDPModels, D3Trees, ARDESPOT
+using POMDPs, POMDPModels, POMDPModelTools, D3Trees, ARDESPOT
 
 pomdp = TigerPOMDP()
 
-solver = DESPOTSolver(bounds=(-20.0, 0.0))
+solver = DESPOTSolver(bounds=(-20.0, 0.0), tree_in_info=true)
 planner = solve(solver, pomdp)
 b0 = initialstate_distribution(pomdp)
 
-tree = ARDESPOT.build_despot(planner, b0)
-inchrome(D3Tree(tree, init_expand=5))
+a, info = action_info(planner, b0)
+inchrome(D3Tree(info[:tree], init_expand=5))
 ```
 will create an interactive tree that looks like this:
 

@@ -1,6 +1,6 @@
 POMDPs.solve(sol::DESPOTSolver, p::POMDP) = DESPOTPlanner(sol, p)
 
-function POMDPs.action_info(p::DESPOTPlanner, b)
+function POMDPModelTools.action_info(p::DESPOTPlanner, b)
     info = Dict{Symbol, Any}()
     try
         Random.seed!(p.rs, rand(p.rng, UInt32))
