@@ -44,7 +44,56 @@ export
 # include("random.jl")
 include("random_2.jl")
 
+"""
+    DESPOTSolver
 
+    An implementation of the ARDESPOT solver trying to closely match the pseudeo
+    code of:
+
+    http://bigbird.comp.nus.edu.sg/m2ap/wordpress/wp-content/uploads/2017/08/jair14.pdf
+
+
+    Fields:
+
+    epsilon_0::Float64
+        The target gap between the upper and the lower bound at the root of the partial DESPOT.
+
+    xi::Float64
+        The rate of target gap reduction.
+
+    K::Int
+        The number of sampled scenarios.
+
+    D::Int
+        The maximum depth of the DESPOT.
+
+    lambda::Float64
+        Reguluarization constant.
+
+    T_max::Float64
+        The maximum online planning time per step.
+
+    max_trials::Int
+        The maximum number of trials of the planner.
+
+    bounds::Any
+        A representation for the upper and lower bound on the RWDU (e.g. IndependentBounds).
+
+    default_action::Any
+        A default action to be returned if the algorithm fails to provide an action.
+
+    rng::AbstractRNG
+        A random number generator for the internal sampling processes.
+
+    random_source::DESPOTRandomSource
+        A source for random numbers in scenario rollout
+
+    bounds_warnings::Bool
+        If true, sanity checks on the provided bounds are performed.
+
+    tree_in_info::Bool
+        If true, a reprenstation of the constructed DESPOT is returned by POMDPModelTools.action_info.
+"""
 @with_kw mutable struct DESPOTSolver <: Solver
     epsilon_0::Float64                      = 0.0
     xi::Float64                             = 0.95
