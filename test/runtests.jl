@@ -6,6 +6,7 @@ using POMDPModels
 using POMDPSimulators
 using Random
 using POMDPModelTools
+using ParticleFilters
 
 include("memorizing_rng.jl")
 
@@ -29,6 +30,23 @@ pol = FeedWhenCrying()
 r1 = ARDESPOT.rollout(pomdp, pol, b, 10)
 r2 = ARDESPOT.rollout(pomdp, pol, b, 10)
 @test r1 == r2
+
+# AbstractParticleBelief interface
+@test n_particles(b) == 1
+s = particle(b,1)
+@test rand(rng, b) == s
+@test pdf(b, rand(rng, b_0)) == 1
+sup = support(b)
+@test length(sup) == 1
+@test first(sup) == s
+@test sampletype(b) == typeof(s)
+@test mode(b) == s
+@test mean(b) == s
+@test first(particles(b)) == s
+@test first(weights(b)) == 1.0
+@test first(weighted_particles(b)) == (s => 1.0)
+@test weight_sum(b) == 1.0
+@test weight(b, 1) == 1.0
 
 # constant bounds
 bounds = (reward(pomdp, true, false)/(1-discount(pomdp)), 0.0)

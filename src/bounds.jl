@@ -14,9 +14,13 @@ function bounds_sanity_check(pomdp::POMDP, sb::ScenarioBelief, L_0, U_0)
     end
 end
 
+"""
+    IndependentBounds(l, u, check_terminal=false)
 
-# Upper and lower do not depend on each other (most cases)
+Specify lower and upper bounds that are independent of each other (the most common case).
 
+This differs from specifying bounds as a `Tuple` because of the `check_terminal` option. If `check_terminal` is true, then if all the states in the belief are terminal, the upper and lower bounds will be overridden and set to 0.
+"""
 struct IndependentBounds{L, U}
     lower::L
     upper::U
