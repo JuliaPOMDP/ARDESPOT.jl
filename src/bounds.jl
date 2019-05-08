@@ -6,7 +6,7 @@ bounds(t::Tuple, pomdp::POMDP, b::ScenarioBelief) = (lbound(t[1], pomdp, b), ubo
 function bounds_sanity_check(pomdp::POMDP, sb::ScenarioBelief, L_0, U_0)
     if L_0 > U_0
         @warn("L_0 ($L_0) > U_0 ($U_0)   |ϕ| = $(length(sb.scenarios))")
-        @info("Try e.g. `IndependentBounds(l, u, correction_thresh=1e-5)`.", maxlog=1)
+        @info("Try e.g. `IndependentBounds(l, u, consistency_fix_thresh=1e-5)`.", maxlog=1)
     end
     if all(isterminal(pomdp, s) for s in particles(sb))
         if L_0 != 0.0 || U_0 != 0.0
@@ -22,7 +22,7 @@ function bounds_sanity_check(pomdp::POMDP, sb::ScenarioBelief, L_0, U_0)
 end
 
 """
-    IndependentBounds(l, u, check_terminal=false, correction_thresh=0.0)
+    IndependentBounds(l, u, check_terminal=false, consistency_fix_thresh=0.0)
 
 Specify lower and upper bounds that are independent of each other (the most common case).
 
@@ -30,19 +30,19 @@ This differs from specifying bounds as a `Tuple` because of the keyword options.
 
 # Keyword Arguments
 - `check_terminal::Bool=false`: if true, then if all the states in the belief are terminal, the upper and lower bounds will be overridden and set to 0.
-- `correction_thresh::Float64=0.0`: if `u < l` and `u >= l-correction_thresh`, then `u` will be bumped up to `l`. 
+- `consistency_fix_thresh::Float64=0.0`: if `u < l` and `u >= l-consistency_fix_thresh`, then `u` will be bumped up to `l`. 
 """
 struct IndependentBounds{L, U}
     lower::L
     upper::U
     check_terminal::Bool
-    correction_thresh::Float64
+    consistency_fix_thresh::Float64
 end
 
 function IndependentBounds(l, u;
                            check_terminal=false,
-                           correction_thresh=0.0)
-    return IndependentBounds(l, u, check_terminal, correction_thresh)
+                           consistency_fix_thresh=0.0)
+    return IndependentBounds(l, u, check_terminal, consistency_fix_thresh)
 end
 
 function bounds(bounds::IndependentBounds, pomdp::POMDP, b::ScenarioBelief)
@@ -51,7 +51,7 @@ function bounds(bounds::IndependentBounds, pomdp::POMDP, b::ScenarioBelief)
     end
     l = lbound(bounds.lower, pomdp, b)
     u = ubound(bounds.upper, pomdp, b)
-    if u < l && u >= l-bounds.correction_thresh
+    if u < l && u >= l-bounds.consistency_fix_thresh
         u = l
     end
     return (l,u)
@@ -61,7 +61,7 @@ function init_bounds(bounds::IndependentBounds, pomdp::POMDP, sol::DESPOTSolver)
     return IndependentBounds(init_bound(bounds.lower, pomdp, sol),
                              init_bound(bounds.upper, pomdp, sol),
                              bounds.check_terminal,
-                             bounds.correction_thresh
+                             bounds.consistency_fix_thresh
                             )
 end
 init_bound(bound, pomdp, sol) = bound
