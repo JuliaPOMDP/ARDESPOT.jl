@@ -21,4 +21,4 @@ POMDPSimulators = "e0d0a172-29c6-5d4e-96d0-f262df5d01fd"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["POMDPModels", "Test", "POMDPSimulators"]
+test = ["Test", "POMDPSimulators", "POMDPModels"]

@@ -11,6 +11,7 @@ using ParticleFilters
 include("memorizing_rng.jl")
 
 pomdp = BabyPOMDP()
+pomdp.discount = 1.0
 
 K = 10
 rng = MersenneTwister(14)
@@ -20,16 +21,22 @@ b_0 = initialstate_distribution(pomdp)
 scenarios = [i=>rand(rng, b_0) for i in 1:K]
 b = ScenarioBelief(scenarios, rs, 0, false)
 pol = FeedWhenCrying()
-r1 = ARDESPOT.branching_sim(pomdp, pol, b, 10)
-r2 = ARDESPOT.branching_sim(pomdp, pol, b, 10)
+r1 = ARDESPOT.branching_sim(pomdp, pol, b, 10, (m,x)->0.0)
+r2 = ARDESPOT.branching_sim(pomdp, pol, b, 10, (m,x)->0.0)
 @test r1 == r2
+tval = 7.0
+r3 = ARDESPOT.branching_sim(pomdp, pol, b, 10, (m,x)->tval)
+@test r3 == r2 + tval*length(b.scenarios)
 
 scenarios = [1=>rand(rng, b_0)]
 b = ScenarioBelief(scenarios, rs, 0, false)
 pol = FeedWhenCrying()
-r1 = ARDESPOT.rollout(pomdp, pol, b, 10)
-r2 = ARDESPOT.rollout(pomdp, pol, b, 10)
+r1 = ARDESPOT.rollout(pomdp, pol, b, 10, (m,x)->0.0)
+r2 = ARDESPOT.rollout(pomdp, pol, b, 10, (m,x)->0.0)
 @test r1 == r2
+tval = 7.0
+r3 = ARDESPOT.rollout(pomdp, pol, b, 10, (m,x)->tval)
+@test r3 == r2 + tval
 
 # AbstractParticleBelief interface
 @test n_particles(b) == 1
@@ -48,6 +55,8 @@ sup = support(b)
 @test weight_sum(b) == 1.0
 @test weight(b, 1) == 1.0
 
+pomdp = BabyPOMDP()
+
 # constant bounds
 bounds = (reward(pomdp, true, false)/(1-discount(pomdp)), 0.0)
 solver = DESPOTSolver(bounds=bounds)
@@ -62,6 +71,13 @@ planner = solve(solver, pomdp)
 hr = HistoryRecorder(max_steps=2)
 @time hist = simulate(hr, pomdp, planner)
 
+# policy lower bound with final value
+fv(m::BabyPOMDP, x) = reward(m, true, false)/(1-discount(m))
+bounds = IndependentBounds(DefaultPolicyLB(FeedWhenCrying(), final_value=fv), 0.0)
+solver = DESPOTSolver(bounds=bounds)
+planner = solve(solver, pomdp)
+hr = HistoryRecorder(max_steps=2)
+@time hist = simulate(hr, pomdp, planner)
 
 # Type stability 
 pomdp = BabyPOMDP()
