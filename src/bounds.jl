@@ -12,6 +12,12 @@ function bounds_sanity_check(pomdp::POMDP, sb::ScenarioBelief, L_0, U_0)
             error(@sprintf("If all states are terminal, lower and upper bounds should be zero (L_0=%-10.2g, U_0=%-10.2g). (try IndependentBounds(l, u, check_terminal=true))", L_0, U_0))
         end
     end
+    if isinf(L_0) || isnan(L_0)
+        @warn("L_0 = $L_0. Infinite bounds are not supported.")
+    end
+    if isinf(U_0) || isnan(U_0)
+        @warn("U_0 = $U_0. Infinite bounds are not supported.")
+    end
 end
 
 """
