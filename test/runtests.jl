@@ -11,6 +11,7 @@ using ParticleFilters
 include("memorizing_rng.jl")
 
 pomdp = BabyPOMDP()
+pomdp.discount = 1.0
 
 K = 10
 rng = MersenneTwister(14)
@@ -23,8 +24,9 @@ pol = FeedWhenCrying()
 r1 = ARDESPOT.branching_sim(pomdp, pol, b, 10, (m,x)->0.0)
 r2 = ARDESPOT.branching_sim(pomdp, pol, b, 10, (m,x)->0.0)
 @test r1 == r2
-# r3 = ARDESPOT.branching_sim(pomdp, pol, b, 10, (m,x)->7.0)
-# @test r2
+tval = 7.0
+r3 = ARDESPOT.branching_sim(pomdp, pol, b, 10, (m,x)->tval)
+@test r3 == r2 + tval*length(b.scenarios)
 
 scenarios = [1=>rand(rng, b_0)]
 b = ScenarioBelief(scenarios, rs, 0, false)
@@ -32,6 +34,9 @@ pol = FeedWhenCrying()
 r1 = ARDESPOT.rollout(pomdp, pol, b, 10, (m,x)->0.0)
 r2 = ARDESPOT.rollout(pomdp, pol, b, 10, (m,x)->0.0)
 @test r1 == r2
+tval = 7.0
+r3 = ARDESPOT.rollout(pomdp, pol, b, 10, (m,x)->tval)
+@test r3 == r2 + tval
 
 # AbstractParticleBelief interface
 @test n_particles(b) == 1
@@ -49,6 +54,8 @@ sup = support(b)
 @test first(weighted_particles(b)) == (s => 1.0)
 @test weight_sum(b) == 1.0
 @test weight(b, 1) == 1.0
+
+pomdp = BabyPOMDP()
 
 # constant bounds
 bounds = (reward(pomdp, true, false)/(1-discount(pomdp)), 0.0)

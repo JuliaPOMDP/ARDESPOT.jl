@@ -4,7 +4,7 @@ function branching_sim(pomdp::POMDP, policy::Policy, b::ScenarioBelief, steps::I
     odict = Dict{O, Vector{Pair{Int, S}}}()
 
     if steps <= 0
-        return tval(pomdp, b)
+        return length(b.scenarios)*tval(pomdp, b)
     end
 
     a = action(policy, b)
