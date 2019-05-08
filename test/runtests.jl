@@ -23,6 +23,8 @@ pol = FeedWhenCrying()
 r1 = ARDESPOT.branching_sim(pomdp, pol, b, 10, (m,x)->0.0)
 r2 = ARDESPOT.branching_sim(pomdp, pol, b, 10, (m,x)->0.0)
 @test r1 == r2
+# r3 = ARDESPOT.branching_sim(pomdp, pol, b, 10, (m,x)->7.0)
+# @test r2
 
 scenarios = [1=>rand(rng, b_0)]
 b = ScenarioBelief(scenarios, rs, 0, false)

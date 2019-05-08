@@ -64,7 +64,7 @@ function rollout(pomdp::POMDP, policy::Policy, b0::ScenarioBelief, steps::Intege
     end
 
     if steps == 0 && !isterminal(pomdp, s)
-        tval(pomdp, s)
+        r_total += disc*tval(pomdp, s)
     end
 
     return r_total
