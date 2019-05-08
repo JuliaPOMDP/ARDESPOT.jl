@@ -87,7 +87,7 @@ end
 
 function DefaultPolicyLB(policy_or_solver::T;
                          max_depth=nothing,
-                         final_value::Function=(m,x)->0.0) where T <: Union{Solver, Policy}
+                         final_value=(m,x)->0.0) where T <: Union{Solver, Policy}
     return DefaultPolicyLB(policy_or_solver, max_depth, final_value)
 end
 
