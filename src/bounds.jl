@@ -72,6 +72,7 @@ end
 struct DefaultPolicyLB{P<:Union{Solver, Policy}, D<:Union{Nothing,Int}}
     policy::P
     max_depth::D
+
 end
 
 function DefaultPolicyLB(policy_or_solver::T; max_depth=nothing) where T <: Union{Solver, Policy}

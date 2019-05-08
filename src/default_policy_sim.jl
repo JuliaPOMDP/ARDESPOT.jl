@@ -1,10 +1,10 @@
-function branching_sim(pomdp::POMDP, policy::Policy, b::ScenarioBelief, steps::Integer)
+function branching_sim(pomdp::POMDP, policy::Policy, b::ScenarioBelief, steps::Integer, tval)
     S = statetype(pomdp)
     O = obstype(pomdp)
     odict = Dict{O, Vector{Pair{Int, S}}}()
 
     if steps <= 0
-        return 0.0
+        return tval(pomdp, b)
     end
 
     a = action(policy, b)
@@ -39,7 +39,7 @@ function branching_sim(pomdp::POMDP, policy::Policy, b::ScenarioBelief, steps::I
 end
 
 # once there is only one scenario left, just run a rollout
-function rollout(pomdp::POMDP, policy::Policy, b0::ScenarioBelief, steps::Integer)
+function rollout(pomdp::POMDP, policy::Policy, b0::ScenarioBelief, steps::Integer, tval)
     @assert length(b0.scenarios) == 1
     disc = 1.0
     r_total = 0.0
@@ -61,6 +61,10 @@ function rollout(pomdp::POMDP, policy::Policy, b0::ScenarioBelief, steps::Intege
 
         disc *= discount(pomdp)
         steps -= 1
+    end
+
+    if steps == 0 && !isterminal(pomdp, s)
+        tval(pomdp, s)
     end
 
     return r_total
