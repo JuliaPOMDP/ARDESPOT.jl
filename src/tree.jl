@@ -99,12 +99,6 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
             scenario_belief = get_belief(D, bp, p.rs)
             L_0, U_0 = bounds(p.bounds, p.pomdp, scenario_belief)
 
-            if L_0 > U_0
-                # @show collect(particles(scenario_belief))
-                # @show collect(isterminal(p.pomdp, s) for s in particles(scenario_belief))
-                @enter lbound(p.bounds.lower, p.pomdp, scenario_belief)
-            end
-
             if p.sol.bounds_warnings
                 bounds_sanity_check(p.pomdp, scenario_belief, L_0, U_0)
             end

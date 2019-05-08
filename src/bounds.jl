@@ -69,27 +69,29 @@ end
 
 # Default Policy Lower Bound
 
-struct DefaultPolicyLB{P<:Union{Solver, Policy}, D<:Union{Nothing,Int}}
+struct DefaultPolicyLB{P<:Union{Solver, Policy}, D<:Union{Nothing,Int}, T<:Function}
     policy::P
     max_depth::D
-
+    terminal_value::T
 end
 
-function DefaultPolicyLB(policy_or_solver::T; max_depth=nothing) where T <: Union{Solver, Policy}
-    return DefaultPolicyLB(policy_or_solver, max_depth)
+function DefaultPolicyLB(policy_or_solver::T;
+                         max_depth=nothing,
+                         terminal_value::Function=(m,x)->0.0) where T <: Union{Solver, Policy}
+    return DefaultPolicyLB(policy_or_solver, max_depth, terminal_value)
 end
 
 function lbound(lb::DefaultPolicyLB, pomdp::POMDP, b::ScenarioBelief)
-    rsum = branching_sim(pomdp, lb.policy, b, lb.max_depth-b.depth)
+    rsum = branching_sim(pomdp, lb.policy, b, lb.max_depth-b.depth, lb.terminal_value)
     return rsum/length(b.scenarios)
 end
 
 function init_bound(lb::DefaultPolicyLB{S}, pomdp::POMDP, sol::DESPOTSolver) where S <: Solver
     policy = solve(lb.policy, pomdp)
-    return init_bound(DefaultPolicyLB(policy, lb.max_depth), pomdp, sol)
+    return init_bound(DefaultPolicyLB(policy, lb.max_depth, lb.terminal_value), pomdp, sol)
 end
 
 function init_bound(lb::DefaultPolicyLB{P}, pomdp::POMDP, sol::DESPOTSolver) where P <: Policy
     max_depth = something(lb.max_depth, sol.D)
-    return DefaultPolicyLB(lb.policy, max_depth)
+    return DefaultPolicyLB(lb.policy, max_depth, lb.terminal_value)
 end

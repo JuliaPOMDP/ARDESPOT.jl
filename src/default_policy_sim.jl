@@ -29,9 +29,9 @@ function branching_sim(pomdp::POMDP, policy::Policy, b::ScenarioBelief, steps::I
     for (o, scenarios) in odict 
         bp = ScenarioBelief(scenarios, b.random_source, b.depth+1, o)
         if length(scenarios) == 1
-            next_r += rollout(pomdp, policy, bp, steps-1)
+            next_r += rollout(pomdp, policy, bp, steps-1, tval)
         else
-            next_r += branching_sim(pomdp, policy, bp, steps-1)
+            next_r += branching_sim(pomdp, policy, bp, steps-1, tval)
         end
     end
 

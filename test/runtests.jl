@@ -20,15 +20,15 @@ b_0 = initialstate_distribution(pomdp)
 scenarios = [i=>rand(rng, b_0) for i in 1:K]
 b = ScenarioBelief(scenarios, rs, 0, false)
 pol = FeedWhenCrying()
-r1 = ARDESPOT.branching_sim(pomdp, pol, b, 10)
-r2 = ARDESPOT.branching_sim(pomdp, pol, b, 10)
+r1 = ARDESPOT.branching_sim(pomdp, pol, b, 10, (m,x)->0.0)
+r2 = ARDESPOT.branching_sim(pomdp, pol, b, 10, (m,x)->0.0)
 @test r1 == r2
 
 scenarios = [1=>rand(rng, b_0)]
 b = ScenarioBelief(scenarios, rs, 0, false)
 pol = FeedWhenCrying()
-r1 = ARDESPOT.rollout(pomdp, pol, b, 10)
-r2 = ARDESPOT.rollout(pomdp, pol, b, 10)
+r1 = ARDESPOT.rollout(pomdp, pol, b, 10, (m,x)->0.0)
+r2 = ARDESPOT.rollout(pomdp, pol, b, 10, (m,x)->0.0)
 @test r1 == r2
 
 # AbstractParticleBelief interface
