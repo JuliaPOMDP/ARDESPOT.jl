@@ -9,6 +9,7 @@ using POMDPModelTools
 using ParticleFilters
 
 include("memorizing_rng.jl")
+include("independent_bounds.jl")
 
 pomdp = BabyPOMDP()
 pomdp.discount = 1.0
@@ -58,15 +59,15 @@ sup = support(b)
 pomdp = BabyPOMDP()
 
 # constant bounds
-bounds = (reward(pomdp, true, false)/(1-discount(pomdp)), 0.0)
-solver = DESPOTSolver(bounds=bounds)
+bds = (reward(pomdp, true, false)/(1-discount(pomdp)), 0.0)
+solver = DESPOTSolver(bounds=bds)
 planner = solve(solver, pomdp)
 hr = HistoryRecorder(max_steps=2)
 @time hist = simulate(hr, pomdp, planner)
 
 # policy lower bound
-bounds = IndependentBounds(DefaultPolicyLB(FeedWhenCrying()), 0.0)
-solver = DESPOTSolver(bounds=bounds)
+bds = IndependentBounds(DefaultPolicyLB(FeedWhenCrying()), 0.0)
+solver = DESPOTSolver(bounds=bds)
 planner = solve(solver, pomdp)
 hr = HistoryRecorder(max_steps=2)
 @time hist = simulate(hr, pomdp, planner)
@@ -81,9 +82,9 @@ hr = HistoryRecorder(max_steps=2)
 
 # Type stability 
 pomdp = BabyPOMDP()
-bounds = IndependentBounds(reward(pomdp, true, false)/(1-discount(pomdp)), 0.0)
+bds = IndependentBounds(reward(pomdp, true, false)/(1-discount(pomdp)), 0.0)
 solver = DESPOTSolver(epsilon_0=0.1,
-                      bounds=bounds,
+                      bounds=bds,
                       rng=MersenneTwister(4)
                      )
 p = solve(solver, pomdp)
@@ -101,10 +102,10 @@ D = @inferred ARDESPOT.build_despot(p, b0)
 @inferred action(p, b0)
 
 
-bounds = IndependentBounds(reward(pomdp, true, false)/(1-discount(pomdp)), 0.0)
+bds = IndependentBounds(reward(pomdp, true, false)/(1-discount(pomdp)), 0.0)
 rng = MersenneTwister(4)
 solver = DESPOTSolver(epsilon_0=0.1,
-                      bounds=bounds,
+                      bounds=bds,
                       rng=rng,
                       random_source=MemorizingSource(500, 90, rng),
                       tree_in_info=true
@@ -132,4 +133,3 @@ for (s, a, o) in stepthrough(pomdp, planner, "sao", max_steps=10)
     println("action $a was taken,")
     println("and observation $o was received.\n")
 end
-
