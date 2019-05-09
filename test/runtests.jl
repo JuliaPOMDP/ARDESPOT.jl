@@ -74,8 +74,8 @@ hr = HistoryRecorder(max_steps=2)
 
 # policy lower bound with final value
 fv(m::BabyPOMDP, x) = reward(m, true, false)/(1-discount(m))
-bounds = IndependentBounds(DefaultPolicyLB(FeedWhenCrying(), final_value=fv), 0.0)
-solver = DESPOTSolver(bounds=bounds)
+bds = IndependentBounds(DefaultPolicyLB(FeedWhenCrying(), final_value=fv), 0.0)
+solver = DESPOTSolver(bounds=bds)
 planner = solve(solver, pomdp)
 hr = HistoryRecorder(max_steps=2)
 @time hist = simulate(hr, pomdp, planner)
