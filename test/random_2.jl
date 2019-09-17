@@ -38,8 +38,7 @@ rng = ARDESPOT.get_rng(src, 1, 1)
 
 @test src.move_count == 1
 
-println("A warning should be thrown below.")
-ARDESPOT.check_consistency(src)
+@test_logs (:warn,) ARDESPOT.check_consistency(src)
 
 # grow reserve
 src = MemorizingSource(1, 4, MersenneTwister(12))

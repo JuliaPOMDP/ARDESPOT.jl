@@ -13,7 +13,7 @@ function branching_sim(pomdp::POMDP, policy::Policy, b::ScenarioBelief, steps::I
     for (k, s) in b.scenarios
         if !isterminal(pomdp, s)
             rng = get_rng(b.random_source, k, b.depth)
-            sp, o, r = generate_sor(pomdp, s, a, rng)
+            sp, o, r = gen(DDNOut(:sp, :o, :r), pomdp, s, a, rng)
 
             if haskey(odict, o)
                 push!(odict[o], k=>sp)
@@ -51,7 +51,7 @@ function rollout(pomdp::POMDP, policy::Policy, b0::ScenarioBelief, steps::Intege
         a = action(policy, b)
 
         rng = get_rng(b.random_source, k, b.depth)
-        sp, o, r = generate_sor(pomdp, s, a, rng)
+        sp, o, r = gen(DDNOut(:sp, :o, :r), pomdp, s, a, rng)
 
         r_total += disc*r
 

@@ -20,7 +20,8 @@ rs = MemorizingSource(K, 50)
 Random.seed!(rs, 10)
 b_0 = initialstate_distribution(pomdp)
 scenarios = [i=>rand(rng, b_0) for i in 1:K]
-b = ScenarioBelief(scenarios, rs, 0, false)
+o = false
+b = ScenarioBelief(scenarios, rs, 0, o)
 pol = FeedWhenCrying()
 r1 = ARDESPOT.branching_sim(pomdp, pol, b, 10, (m,x)->0.0)
 r2 = ARDESPOT.branching_sim(pomdp, pol, b, 10, (m,x)->0.0)
@@ -47,7 +48,6 @@ s = particle(b,1)
 sup = support(b)
 @test length(sup) == 1
 @test first(sup) == s
-@test sampletype(b) == typeof(s)
 @test mode(b) == s
 @test mean(b) == s
 @test first(particles(b)) == s
@@ -55,6 +55,9 @@ sup = support(b)
 @test first(weighted_particles(b)) == (s => 1.0)
 @test weight_sum(b) == 1.0
 @test weight(b, 1) == 1.0
+@test currentobs(b) == o
+@test_deprecated previous_obs(b)
+@test history(b)[end].o == o
 
 pomdp = BabyPOMDP()
 

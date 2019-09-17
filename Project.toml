@@ -1,7 +1,7 @@
 name = "ARDESPOT"
 uuid = "d96c9ae4-3372-47d5-8a88-316ae77be8cf"
 repo = "https://github.com/JuliaPOMDP/ARDESPOT.jl"
-version = "0.2.1"
+version = "0.3.0"
 
 [deps]
 BasicPOMCP = "d721219e-3fc6-5570-a8ef-e5402f47c49e"
@@ -14,6 +14,10 @@ Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 ParticleFilters = "c8b314e2-9260-5cf8-ae76-3be7461ca6d0"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
+[compat]
+POMDPs = "0.7.3, 0.8"
+julia = "1"
 
 [extras]
 POMDPModels = "355abbd5-f08e-5560-ac9e-8b5f2592a0ca"

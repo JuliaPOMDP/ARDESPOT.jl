@@ -2,7 +2,7 @@ struct ScenarioBelief{S, O, RS<:DESPOTRandomSource} <: AbstractParticleBelief{S}
     scenarios::Vector{Pair{Int,S}}
     random_source::RS
     depth::Int
-    _obs::O # this might be replaced by ao_history later - use previous_obs to access
+    _obs::O
 end
 
 rand(rng::AbstractRNG, b::ScenarioBelief) = last(b.scenarios[rand(rng, 1:length(b.scenarios))])
@@ -15,6 +15,8 @@ ParticleFilters.weights(b::ScenarioBelief) = (1/length(b.scenarios) for p in b.s
 ParticleFilters.weighted_particles(b::ScenarioBelief) = (last(p)=>1/length(b.scenarios) for p in b.scenarios)
 POMDPs.pdf(b::ScenarioBelief{S}, s::S) where S = sum(p==s for p in particles(b))/length(b.scenarios) # this is slow
 POMDPs.mean(b::ScenarioBelief) = mean(last, b.scenarios)
-previous_obs(b::ScenarioBelief) = b._obs
+POMDPs.currentobs(b::ScenarioBelief) = b._obs
+@deprecate previous_obs POMDPs.currentobs
+POMDPs.history(b::ScenarioBelief) = tuple((o=currentobs(b),))
 
 initialize_belief(::PreviousObservationUpdater, b::ScenarioBelief) = previous_obs(b)
