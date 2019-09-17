@@ -71,7 +71,7 @@ end
 
 function backup!(D::DESPOT, b::Int, p::DESPOTPlanner)
     # Note: maybe this could be sped up by just calculating the change in the one mu and l corresponding to bp, rather than summing up over all bp
-    while b != 1 
+    while b != 1
         ba = D.parent[b]
         b = D.parent_b[b]
 

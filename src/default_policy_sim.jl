@@ -26,7 +26,7 @@ function branching_sim(pomdp::POMDP, policy::Policy, b::ScenarioBelief, steps::I
     end
 
     next_r = 0.0
-    for (o, scenarios) in odict 
+    for (o, scenarios) in odict
         bp = ScenarioBelief(scenarios, b.random_source, b.depth+1, o)
         if length(scenarios) == 1
             next_r += rollout(pomdp, policy, bp, steps-1, fval)

@@ -6,7 +6,7 @@ function POMDPModelTools.action_info(p::DESPOTPlanner, b)
         Random.seed!(p.rs, rand(p.rng, UInt32))
 
         D = build_despot(p, b)
-        
+
         if p.sol.tree_in_info
             info[:tree] = D
         end
@@ -41,7 +41,7 @@ ba_l(D::DESPOT, ba::Int) = D.ba_rho[ba] + sum(D.l[bnode] for bnode in D.ba_child
 
 POMDPs.updater(p::DESPOTPlanner) = SIRParticleFilter(p.pomdp, p.sol.K, rng=p.rng)
 
-function Random.seed!(p::DESPOTPlanner, seed) 
+function Random.seed!(p::DESPOTPlanner, seed)
     Random.seed!(p.rng, seed)
     return p
 end

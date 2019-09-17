@@ -98,13 +98,13 @@ Further information can be found in the field docstrings (e.g.
 
     "A default action to be returned if the algorithm fails to provide an action."
     default_action::Any                     = ExceptionRethrow()
-    
+
     "A random number generator for the internal sampling processes."
     rng::AbstractRNG                        = Random.GLOBAL_RNG
-    
+
     "A source for random numbers in scenario rollout"
     random_source::DESPOTRandomSource       = MemorizingSource(K, D, rng)
-    
+
     "If true, sanity checks on the provided bounds are performed."
     bounds_warnings::Bool                   = true
 

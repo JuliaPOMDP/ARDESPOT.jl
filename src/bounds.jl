@@ -30,7 +30,7 @@ This differs from specifying bounds as a `Tuple` because of the keyword options.
 
 # Keyword Arguments
 - `check_terminal::Bool=false`: if true, then if all the states in the belief are terminal, the upper and lower bounds will be overridden and set to 0.
-- `consistency_fix_thresh::Float64=0.0`: if `u < l` and `u >= l-consistency_fix_thresh`, then `u` will be bumped up to `l`. 
+- `consistency_fix_thresh::Float64=0.0`: if `u < l` and `u >= l-consistency_fix_thresh`, then `u` will be bumped up to `l`.
 """
 struct IndependentBounds{L, U}
     lower::L
@@ -57,7 +57,7 @@ function bounds(bounds::IndependentBounds, pomdp::POMDP, b::ScenarioBelief)
     return (l,u)
 end
 
-function init_bounds(bounds::IndependentBounds, pomdp::POMDP, sol::DESPOTSolver) 
+function init_bounds(bounds::IndependentBounds, pomdp::POMDP, sol::DESPOTSolver)
     return IndependentBounds(init_bound(bounds.lower, pomdp, sol),
                              init_bound(bounds.upper, pomdp, sol),
                              bounds.check_terminal,

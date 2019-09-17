@@ -83,7 +83,7 @@ planner = solve(solver, pomdp)
 hr = HistoryRecorder(max_steps=2)
 @time hist = simulate(hr, pomdp, planner)
 
-# Type stability 
+# Type stability
 pomdp = BabyPOMDP()
 bds = IndependentBounds(reward(pomdp, true, false)/(1-discount(pomdp)), 0.0)
 solver = DESPOTSolver(epsilon_0=0.1,

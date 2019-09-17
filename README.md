@@ -1,7 +1,7 @@
 # ARDESPOT
 
-[![Build Status](https://travis-ci.org/JuliaPOMDP/ARDESPOT.jl.svg?branch=master)](https://travis-ci.org/JuliaPOMDP/ARDESPOT.jl) 
-[![Coverage Status](https://coveralls.io/repos/JuliaPOMDP/ARDESPOT.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/JuliaPOMDP/ARDESPOT.jl?branch=master) 
+[![Build Status](https://travis-ci.org/JuliaPOMDP/ARDESPOT.jl.svg?branch=master)](https://travis-ci.org/JuliaPOMDP/ARDESPOT.jl)
+[![Coverage Status](https://coveralls.io/repos/JuliaPOMDP/ARDESPOT.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/JuliaPOMDP/ARDESPOT.jl?branch=master)
 [![codecov.io](http://codecov.io/github/JuliaPOMDP/ARDESPOT.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaPOMDP/ARDESPOT.jl?branch=master)
 
 An implementation of the AR-DESPOT (Anytime Regularized DEterminized Sparse Partially Observable Tree) online POMDP Solver.

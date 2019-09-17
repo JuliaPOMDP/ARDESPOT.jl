@@ -24,7 +24,7 @@ function DESPOT(p::DESPOTPlanner, b_0)
     A = actiontype(p.pomdp)
     O = obstype(p.pomdp)
     root_scenarios = [i=>rand(p.rng, b_0) for i in 1:p.sol.K]
-    
+
     scenario_belief = ScenarioBelief(root_scenarios, p.rs, 0, b_0)
     L_0, U_0 = bounds(p.bounds, p.pomdp, scenario_belief)
 
@@ -42,7 +42,7 @@ function DESPOT(p::DESPOTPlanner, b_0)
                          [U_0],
                          [L_0],
                          Vector{O}(undef, 1),
-                 
+
                          Vector{Int}[],
                          Float64[],
                          Float64[],
