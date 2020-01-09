@@ -17,7 +17,7 @@ mutable struct MemorizingSource{RNG<:AbstractRNG} <: DESPOTRandomSource
     move_warning::Bool
 end
 
-function MemorizingSource(K::Int, depth::Int, rng::AbstractRNG=Random.GLOBAL_RNG; min_reserve=0, grow_reserve=true, move_warning=true)
+function MemorizingSource(K::Int, depth::Int, rng::AbstractRNG; min_reserve=0, grow_reserve=true, move_warning=true)
     RNG = typeof(rng)
     memory = Float64[]
     rngs = Matrix{MemorizingRNG{MemorizingSource{RNG}}}(undef, depth+1, K)

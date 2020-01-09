@@ -16,7 +16,7 @@ pomdp.discount = 1.0
 
 K = 10
 rng = MersenneTwister(14)
-rs = MemorizingSource(K, 50)
+rs = MemorizingSource(K, 50, rng)
 Random.seed!(rs, 10)
 b_0 = initialstate_distribution(pomdp)
 scenarios = [i=>rand(rng, b_0) for i in 1:K]
@@ -131,7 +131,7 @@ pomdp = TigerPOMDP()
 solver = DESPOTSolver(bounds=(-20.0, 0.0))
 planner = solve(solver, pomdp)
 
-for (s, a, o) in stepthrough(pomdp, planner, "sao", max_steps=10)
+for (s, a, o) in stepthrough(pomdp, planner, "s,a,o", max_steps=10)
     println("State was $s,")
     println("action $a was taken,")
     println("and observation $o was received.\n")

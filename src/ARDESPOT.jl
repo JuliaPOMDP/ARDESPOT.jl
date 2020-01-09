@@ -100,7 +100,7 @@ Further information can be found in the field docstrings (e.g.
     default_action::Any                     = ExceptionRethrow()
 
     "A random number generator for the internal sampling processes."
-    rng::AbstractRNG                        = Random.GLOBAL_RNG
+    rng::MersenneTwister                    = MersenneTwister(rand(UInt32))
 
     "A source for random numbers in scenario rollout"
     random_source::DESPOTRandomSource       = MemorizingSource(K, D, rng)
