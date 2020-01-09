@@ -15,7 +15,7 @@ pomdp = BabyPOMDP()
 
 K = 10
 rng = MersenneTwister(14)
-rs = MemorizingSource(K, 50)
+rs = MemorizingSource(K, 50, rng)
 Random.seed!(rs, 10)
 b_0 = initialstate_distribution(pomdp)
 scenarios = [i=>rand(rng, b_0) for i in 1:K]
