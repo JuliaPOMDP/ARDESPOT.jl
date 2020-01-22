@@ -33,7 +33,7 @@ pomdp = TigerPOMDP()
 solver = DESPOTSolver(bounds=(-20.0, 0.0))
 planner = solve(solver, pomdp)
 
-for (s, a, o) in stepthrough(pomdp, planner, "sao", max_steps=10)
+for (s, a, o) in stepthrough(pomdp, planner, "s,a,o", max_steps=10)
     println("State was $s,")
     println("action $a was taken,")
     println("and observation $o was received.\n")
