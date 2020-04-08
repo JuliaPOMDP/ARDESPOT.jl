@@ -80,6 +80,12 @@ DESPOTSolver(bounds=(DefaultPolicyLB(RandomSolver()), 0.0))
 ```
 will use a random rollout policy to calculate a lower bound.
 
+Using an `IndependentBounds` object adds some robustness. For example
+```julia
+DESPOTSolver(bounds=IndependentBounds(DefaultPolicyLB(RandomSolver()), 0.0, check_terminal=true, consistency_fix_thresh=0.1))
+```
+will automatically correct some common problems arising from using approximate bounds.
+
 Bounds need not be calculated independently; a single object or function that returns a tuple can be passed to the `bounds` argument. More examples can be found in [src/bounds.jl](src/bounds.jl). Please file an issue if more documentation is needed.
 
 ## Visualization
