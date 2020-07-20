@@ -67,26 +67,44 @@ Each can be set with a keyword argument in the DESPOTSolver constructor. The def
 
 ### Bounds
 
-Bounds can be specified as a tuple `(lower_bound, upper_bound)`, where the lower and upper bounds are one of
-- a number
-- a function `f` - in this case `f(pomdp, b::ScenarioBelief)` is called to determine the bound.
-- an object `bound` - in this case `ARDESPOT.lbound(bound, pomdp, b::ScenarioBelief)` or `ARDESPOT.ubound(...)` will be called to determine the bound.
+#### Independent bounds
 
-To access the state particles in a `ScenairoBelief` `b`, use `particles(b)` (or `collect(particles(b))` to get a vector).
-
-A common lower bound strategy is to use a rollout policy. This is provided by the `DefaultPolicyLB` type, for example
+In most cases, the recommended way to specify bounds is with an `IndependentBounds` object, i.e.
 ```julia
-DESPOTSolver(bounds=(DefaultPolicyLB(RandomSolver()), 0.0))
+DESPOTSolver(bounds=IndependentBounds(lower, upper))
 ```
-will use a random rollout policy to calculate a lower bound.
+where `lower` and `upper` are either a number or a function (see below).
 
-Using an `IndependentBounds` object adds some robustness. For example
+Often, the lower bound is calculated with a default policy, this can be accomplished using a `DefaultPolicyLB` with any `Solver` or `Policy`.
+
+If `lower` or `upper` is a function, it should handle two arguments. The first is the `POMDP` object and the second is the `ScenarioBelief`. To access the state particles in a `ScenairoBelief` `b`, use `particles(b)` (or `collect(particles(b))` to get a vector).
+
+In most cases, the `check_terminal` and `consistency_fix_thresh` keyword arguments of `IndependentBounds` should be used to add robustness (see the `IndependentBounds` docstring for more info.
+
+##### Example
+
+For the `BabyPOMDP` from `POMDPModels`, bounds setup might look like this:
 ```julia
-DESPOTSolver(bounds=IndependentBounds(DefaultPolicyLB(RandomSolver()), 0.0, check_terminal=true, consistency_fix_thresh=0.1))
-```
-will automatically correct some common problems arising from using approximate bounds.
+using POMDPModels
+using POMDPPolicies
 
-Bounds need not be calculated independently; a single object or function that returns a tuple can be passed to the `bounds` argument. More examples can be found in [src/bounds.jl](src/bounds.jl). Please file an issue if more documentation is needed.
+always_feed = FunctionPolicy(b->true)
+lower = DefaultPolicyLB(always_feed)
+
+function upper(pomdp::BabyPOMDP, b::ScenarioBelief)
+    if all(s==true for s in particles(b)) # all particles are hungry
+        return pomdp.r_hungry # the baby is hungry this time, but then becomes full magically and stays that way forever
+    else
+        return 0.0 # the baby magically stays full forever
+    end
+end
+
+solver = DESPOTSolver(bounds=IndependentBounds(lower, upper))
+```
+
+#### Non-Independent bounds
+
+Bounds need not be calculated independently; a single function that takes in the `POMDP` and `ScenarioBelief` and returns a tuple containing the lower and upper bounds can be passed to the `bounds` argument.
 
 ## Visualization
 
