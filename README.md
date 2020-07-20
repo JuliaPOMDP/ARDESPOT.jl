@@ -79,7 +79,7 @@ Often, the lower bound is calculated with a default policy, this can be accompli
 
 If `lower` or `upper` is a function, it should handle two arguments. The first is the `POMDP` object and the second is the `ScenarioBelief`. To access the state particles in a `ScenairoBelief` `b`, use `particles(b)` (or `collect(particles(b))` to get a vector).
 
-In most cases, the `check_terminal` and `consistency_fix_thresh` keyword arguments of `IndependentBounds` should be used to add robustness (see the `IndependentBounds` docstring for more info.
+In most cases, the `check_terminal` and `consistency_fix_thresh` keyword arguments of `IndependentBounds` should be used to add robustness (see the `IndependentBounds` docstring for more info).
 
 ##### Example
 
