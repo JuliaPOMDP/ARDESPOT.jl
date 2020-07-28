@@ -96,7 +96,10 @@ Further information can be found in the field docstrings (e.g.
     "A representation for the upper and lower bound on the discounted value (e.g. `IndependentBounds`)."
     bounds::Any                             = IndependentBounds(-1e6, 1e6)
 
-    "A default action to be returned if the algorithm fails to provide an action."
+    """A default action to use if algorithm fails to provide an action because of an error.
+   
+    This can either be an action object, i.e. `default_action=1` if `actiontype(pomdp)==Int` or a function `f(pomdp, b, ex)` where b is the belief and ex is the exception that caused the planner to fail.
+    """
     default_action::Any                     = ExceptionRethrow()
 
     "A random number generator for the internal sampling processes."
