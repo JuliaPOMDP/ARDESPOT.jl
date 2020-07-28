@@ -44,26 +44,7 @@ For minimal examples of problem implementations, see [this notebook](https://git
 
 ## Solver Options
 
-Solver options can be found in the `DESPOTSolver` docstring:
-
-```julia
-julia> ?DESPOTSolver
-...
-  epsilon_0       :: Float64
-  xi              :: Float64
-  K               :: Int64
-  D               :: Int64
-  lambda          :: Float64
-  T_max           :: Float64
-  max_trials      :: Int64
-  bounds          :: Any
-  default_action  :: Any
-  rng             :: AbstractRNG
-  random_source   :: ARDESPOT.DESPOTRandomSource
-  bounds_warnings :: Bool
-```
-
-Each can be set with a keyword argument in the DESPOTSolver constructor. The definitions of the parameters match as closely as possible to the corresponding definition in the pseudocode of [this paper](http://bigbird.comp.nus.edu.sg/m2ap/wordpress/wp-content/uploads/2017/08/jair14.pdf).
+Solver options can be found in the `DESPOTSolver` docstring and accessed using [Julia's built in documentation system](https://docs.julialang.org/en/v1/manual/documentation/#Accessing-Documentation-1) (or directly in the [Solver source code](/src/ARDESPOT.jl)). Each option has its own docstring and can be set with a keyword argument in the `DESPOTSolver` constructor. The definitions of the parameters match as closely as possible to the corresponding definition in the pseudocode of [this paper](http://bigbird.comp.nus.edu.sg/m2ap/wordpress/wp-content/uploads/2017/08/jair14.pdf).
 
 ### Bounds
 
