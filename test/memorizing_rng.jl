@@ -15,3 +15,4 @@ rand(rng, 1:1_000_000)
 randn(rng, (3,3))
 
 @test isapprox(sum(rand(rng, Bool, 1_000_000))/1_000_000, 0.5, atol=0.001)
+@test isapprox(sum(rand(rng, [1, 1, 1, 1, 0, 0, 0, 0], 1_000_000))/1_000_000, 0.5, atol=0.001)
