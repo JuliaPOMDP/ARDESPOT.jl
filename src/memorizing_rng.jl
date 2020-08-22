@@ -39,7 +39,7 @@ end
 rand(r::MemorizingRNG, T::SamplerUnion(Bool, Int8, UInt8, Int16, UInt16, Int32, UInt32)) =
     rand(r, UInt52Raw()) % T[]
 
-# zsunberg made the two below up
+# zsunberg made the two below up - efficiency could probably be improved
 rand(r::MemorizingRNG, T::SamplerType{UInt64}) = rand(r, UInt32)*(convert(UInt64, typemax(UInt32)) + one(UInt64)) + rand(r, UInt32)
 rand(r::MemorizingRNG, T::SamplerType{Int64}) = reinterpret(Int64, rand(r, UInt64))
 
