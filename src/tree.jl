@@ -67,7 +67,7 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
             rng = get_rng(p.rs, first(scen), D.Delta[b])
             s = last(scen)
             if !isterminal(p.pomdp, s)
-                sp, o, r = gen(DDNOut(:sp, :o, :r) , p.pomdp, s, a, rng)
+                sp, o, r = @gen(:sp, :o, :r)(p.pomdp, s, a, rng)
                 rsum += r
                 bp = get(odict, o, 0)
                 if bp == 0

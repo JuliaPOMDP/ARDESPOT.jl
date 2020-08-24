@@ -18,7 +18,7 @@ K = 10
 rng = MersenneTwister(14)
 rs = MemorizingSource(K, 50, rng)
 Random.seed!(rs, 10)
-b_0 = initialstate_distribution(pomdp)
+b_0 = initialstate(pomdp)
 scenarios = [i=>rand(rng, b_0) for i in 1:K]
 o = false
 b = ScenarioBelief(scenarios, rs, 0, o)
@@ -92,7 +92,7 @@ solver = DESPOTSolver(epsilon_0=0.1,
                      )
 p = solve(solver, pomdp)
 
-b0 = initialstate_distribution(pomdp)
+b0 = initialstate(pomdp)
 D = @inferred ARDESPOT.build_despot(p, b0)
 @inferred ARDESPOT.explore!(D, 1, p)
 @inferred ARDESPOT.expand!(D, length(D.children), p)
@@ -114,13 +114,13 @@ solver = DESPOTSolver(epsilon_0=0.1,
                       tree_in_info=true
                      )
 p = solve(solver, pomdp)
-a = action(p, initialstate_distribution(pomdp))
+a = action(p, initialstate(pomdp))
 
 include("random_2.jl")
 
 # visualization
 show(stdout, MIME("text/plain"), D)
-a, info = action_info(p, initialstate_distribution(pomdp))
+a, info = action_info(p, initialstate(pomdp))
 show(stdout, MIME("text/plain"), info[:tree])
 
 # from README:
