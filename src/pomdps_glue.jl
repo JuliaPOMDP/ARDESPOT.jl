@@ -23,7 +23,7 @@ function POMDPModelTools.action_info(p::DESPOTPlanner, b)
             l = ba_l(D, ba)
             if l > best_l
                 best_l = l
-                best_as = [D.ba_action[ba]]
+                best_as = actiontype(p.pomdp)[D.ba_action[ba]]
             elseif l == best_l
                 push!(best_as, D.ba_action[ba])
             end
