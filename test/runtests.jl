@@ -5,7 +5,7 @@ using POMDPs
 using POMDPModels
 using POMDPSimulators
 using Random
-using POMDPModelTools
+using POMDPTools
 using ParticleFilters
 
 include("memorizing_rng.jl")
@@ -124,7 +124,8 @@ a, info = action_info(p, initialstate(pomdp))
 show(stdout, MIME("text/plain"), info[:tree])
 
 # from README:
-using POMDPs, POMDPModels, POMDPSimulators, ARDESPOT
+using POMDPs, POMDPModels, ARDESPOT
+using POMDPTools
 
 pomdp = TigerPOMDP()
 

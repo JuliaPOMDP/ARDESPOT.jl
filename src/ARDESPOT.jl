@@ -1,14 +1,13 @@
 module ARDESPOT
 
 using POMDPs
-using BeliefUpdaters
 using Parameters
 using CPUTime
 using ParticleFilters
 using D3Trees
 using Random
 using Printf
-using POMDPModelTools
+using POMDPTools
 
 using BasicPOMCP # for ExceptionRethrow and NoDecision
 import BasicPOMCP.default_action
@@ -111,7 +110,7 @@ Further information can be found in the field docstrings (e.g.
     "If true, sanity checks on the provided bounds are performed."
     bounds_warnings::Bool                   = true
 
-    "If true, a reprenstation of the constructed DESPOT is returned by POMDPModelTools.action_info."
+    "If true, a reprenstation of the constructed DESPOT is returned by POMDPTools.action_info."
     tree_in_info::Bool                      = false
 end
 

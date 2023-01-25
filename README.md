@@ -26,7 +26,8 @@ Pkg.add("ARDESPOT")
 ## Usage
 
 ```julia
-using POMDPs, POMDPModels, POMDPSimulators, ARDESPOT
+using POMDPs, POMDPModels, ARDESPOT
+using POMDPTools
 
 pomdp = TigerPOMDP()
 
@@ -67,8 +68,7 @@ In most cases, the `check_terminal` and `consistency_fix_thresh` keyword argumen
 For the `BabyPOMDP` from `POMDPModels`, bounds setup might look like this:
 ```julia
 using POMDPModels
-using POMDPPolicies
-
+using POMDPTools
 always_feed = FunctionPolicy(b->true)
 lower = DefaultPolicyLB(always_feed)
 
@@ -92,7 +92,8 @@ Bounds need not be calculated independently; a single function that takes in the
 [D3Trees.jl](https://github.com/sisl/D3Trees.jl) can be used to visualize the search tree, for example
 
 ```julia
-using POMDPs, POMDPModels, POMDPModelTools, D3Trees, ARDESPOT
+using POMDPs, POMDPModels, D3Trees, ARDESPOT
+using POMDPTools
 
 pomdp = TigerPOMDP()
 
