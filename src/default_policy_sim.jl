@@ -1,7 +1,7 @@
 function branching_sim(pomdp::POMDP, policy::Policy, b::ScenarioBelief, steps::Integer, fval)
     S = statetype(pomdp)
     O = obstype(pomdp)
-    odict = Dict{O, Vector{Pair{Int, S}}}()
+    odict = OrderedDict{O, Vector{Pair{Int, S}}}()
 
     if steps <= 0
         return length(b.scenarios)*fval(pomdp, b)

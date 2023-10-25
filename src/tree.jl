@@ -56,7 +56,7 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
     S = statetype(p.pomdp)
     A = actiontype(p.pomdp)
     O = obstype(p.pomdp)
-    odict = Dict{O, Int}()
+    odict = OrderedDict{O, Int}()
 
     belief = get_belief(D, b, p.rs)
     for a in actions(p.pomdp, belief)
