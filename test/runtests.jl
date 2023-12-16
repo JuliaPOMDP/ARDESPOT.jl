@@ -3,7 +3,6 @@ using Test
 
 using POMDPs
 using POMDPModels
-using POMDPSimulators
 using Random
 using POMDPTools
 using ParticleFilters
