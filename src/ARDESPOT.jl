@@ -8,7 +8,6 @@ using D3Trees
 using Random
 using Printf
 using POMDPTools
-using OrderedCollections
 
 using BasicPOMCP # for ExceptionRethrow and NoDecision
 import BasicPOMCP.default_action
