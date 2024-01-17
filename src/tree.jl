@@ -56,11 +56,13 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
     S = statetype(p.pomdp)
     A = actiontype(p.pomdp)
     O = obstype(p.pomdp)
-    odict = OrderedDict{O, Int}()
+    odict = Dict{O, Int}()
+    olist = O[]
 
     belief = get_belief(D, b, p.rs)
     for a in actions(p.pomdp, belief)
         empty!(odict)
+        empty!(olist)
         rsum = 0.0
 
         for scen in D.scenarios[b]
@@ -74,12 +76,13 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
                     push!(D.scenarios, Vector{Pair{Int, S}}())
                     bp = length(D.scenarios)
                     odict[o] = bp
+                    push!(olist,o)
                 end
                 push!(D.scenarios[bp], first(scen)=>sp)
             end
         end
 
-        push!(D.ba_children, collect(values(odict)))
+        push!(D.ba_children, [odict[o] for o in olist])
         ba = length(D.ba_children)
         push!(D.ba_action, a)
         push!(D.children[b], ba)
@@ -89,7 +92,9 @@ function expand!(D::DESPOT, b::Int, p::DESPOTPlanner)
 
         nbps = length(odict)
         resize!(D, length(D.children) + nbps)
-        for (o, bp) in odict
+        for o in olist
+            bp = odict[o]
+
             D.obs[bp] = o
             D.children[bp] = Int[]
             D.parent_b[bp] = b
