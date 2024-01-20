@@ -92,7 +92,8 @@ solver = DESPOTSolver(epsilon_0=0.1,
 p = solve(solver, pomdp)
 
 b0 = initialstate(pomdp)
-D = @inferred ARDESPOT.build_despot(p, b0)
+D, search_time = @inferred ARDESPOT.build_despot(p, b0)
+@test search_time !== NaN
 @inferred ARDESPOT.explore!(D, 1, p)
 @inferred ARDESPOT.expand!(D, length(D.children), p)
 @inferred ARDESPOT.prune!(D, 1, p)
@@ -121,6 +122,9 @@ include("random_2.jl")
 show(stdout, MIME("text/plain"), D)
 a, info = action_info(p, initialstate(pomdp))
 show(stdout, MIME("text/plain"), info[:tree])
+
+# check if search_time exists in info
+@test info[:search_time_us] !== NaN
 
 # from README:
 using POMDPs, POMDPModels, ARDESPOT

@@ -12,7 +12,7 @@ function build_despot(p::DESPOTPlanner, b_0)
         trial += 1
     end
 
-    return D
+    return D, CPUtime_us()-start
 end
 
 function explore!(D::DESPOT, b::Int, p::DESPOTPlanner)
