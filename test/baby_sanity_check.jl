@@ -1,6 +1,6 @@
 using POMDPs
 using ARDESPOT
-using POMDPToolbox
+using POMDPTools
 using POMDPModels
 using ProgressMeter
 
