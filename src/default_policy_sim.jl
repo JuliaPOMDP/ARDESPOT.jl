@@ -2,7 +2,7 @@ function branching_sim(pomdp::POMDP, policy::Policy, b::ScenarioBelief, steps::I
     S = statetype(pomdp)
     O = obstype(pomdp)
     odict = Dict{O, Vector{Pair{Int, S}}}()
-    o_list = O[]
+    olist = O[]
 
     if steps <= 0
         return length(b.scenarios)*fval(pomdp, b)
@@ -20,14 +20,14 @@ function branching_sim(pomdp::POMDP, policy::Policy, b::ScenarioBelief, steps::I
                 push!(odict[o], k=>sp)
             else
                 odict[o] = [k=>sp]
-                push!(o_list,o)
+                push!(olist,o)
             end
 
             r_sum += r
         end
     end
     next_r = 0.0
-    for o in o_list
+    for o in olist
         scenarios = odict[o]
         bp = ScenarioBelief(scenarios, b.random_source, b.depth+1, o)
         if length(scenarios) == 1
