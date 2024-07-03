@@ -1,8 +1,12 @@
+#Benchmarks for ARDESPOT.jl PR No. 32 (Use OrderedDict)
+
+#Note: Uses HistoryRecorder instead of calls to action directly. This may add additional noise.
+
 using Pkg
 Pkg.activate(".")
 using ARDESPOT
 
-Pkg.activate("benchmark")
+Pkg.activate("pr32_benchmarks")
 using BenchmarkTools
 
 using POMDPs

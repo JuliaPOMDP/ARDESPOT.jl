@@ -1,3 +1,4 @@
+#LD Policies for Bounds
 struct LDPolicy{M<:POMDP,S}<:Policy
     m::M
     particle_dict::Dict{S,Float64}
@@ -11,7 +12,7 @@ function LDPolicy(m::LightDark1D{S}) where S
     return LDPolicy(m,Dict{S,Float64}(),-1,planner)
 end
 
-##Tyler's map_bel 
+##Tyler's map_bel:
 @inline function get_incr!(h::Dict{K,V}, key::K, v) where {K,V} # modified from dict.jl
     index = Base.ht_keyindex2!(h, key)
 

@@ -1,3 +1,5 @@
+#LightDark from POMDPModels.jl, modified for discrete binned observations
+
 using Distributions
 # A one-dimensional light-dark problem, originally used to test MCVI
 # A very simple POMDP with continuous state and observation spaces.
