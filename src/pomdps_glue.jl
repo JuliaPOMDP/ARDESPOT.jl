@@ -5,11 +5,12 @@ function POMDPTools.action_info(p::DESPOTPlanner, b)
     try
         Random.seed!(p.rs, rand(p.rng, UInt32))
 
-        D = build_despot(p, b)
+        D, search_time = build_despot(p, b)
 
         if p.sol.tree_in_info
             info[:tree] = D
         end
+        info[:search_time_us] = search_time
 
         check_consistency(p.rs)
 
